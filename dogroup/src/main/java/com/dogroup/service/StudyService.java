@@ -80,7 +80,7 @@ public class StudyService {
 	 * @param study
 	 */
 	public void openStudy(StudyDTO study) throws AddException {
-		if (compareUserBalanceWithStudyFee(study.getStudyFee(), study.getUserEmail())) {
+		if (compareUserBalanceWithStudyFee(study.getStudyFee(), study.getStudyLeader().getEmail())) {
 			repository.insertStudy(study);
 		} else {
 			throw new AddException("스터디를 개설하는데 실패했습니다.");

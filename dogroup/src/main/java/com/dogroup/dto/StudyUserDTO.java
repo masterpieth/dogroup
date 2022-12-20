@@ -9,13 +9,13 @@ import java.util.List;
  */
 public class StudyUserDTO extends UserDTO {
 	private int studyId;					//스터디 ID
-	private List<HomeworkDTO> HomeworkList;	//제출한 과제 전체 리스트
+	private List<HomeworkDTO> homeworkList;	//제출한 과제 전체 리스트
 	private	int[] checkHomework;			//주차별 유효 과제 체크 리스트	
 	
 	public StudyUserDTO(int studyId, List<HomeworkDTO> homeworkList, int[] checkHomework) {
 		super();
 		this.studyId = studyId;
-		HomeworkList = homeworkList;
+		this.homeworkList = homeworkList;
 		this.checkHomework = checkHomework;
 	}
 	public StudyUserDTO() {
@@ -31,10 +31,10 @@ public class StudyUserDTO extends UserDTO {
 		this.studyId = studyId;
 	}
 	public List<HomeworkDTO> getHomeworkList() {
-		return HomeworkList;
+		return homeworkList;
 	}
 	public void setHomeworkList(List<HomeworkDTO> homeworkList) {
-		HomeworkList = homeworkList;
+		this.homeworkList = homeworkList;
 	}
 	public int[] getCheckHomework() {
 		return checkHomework;

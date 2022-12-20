@@ -9,37 +9,41 @@ import java.util.List;
  *
  */
 public class HomeworkDTO {
-    private int    stduyID;         //스터디 ID
+    private int studyId; 	        //스터디 ID
     private String userEmail;       //회원 ID
     private Date studySubmitDt; 	//제출 날짜
 	
     public HomeworkDTO() {
 		super();
 	}
-	public HomeworkDTO(int stduyID, String userEmail, Date studySubmitDt) {
-		super();
-		this.stduyID = stduyID;
+
+	public HomeworkDTO(int studyId, String userEmail, Date studySubmitDt) {
+		this.studyId = studyId;
 		this.userEmail = userEmail;
 		this.studySubmitDt = studySubmitDt;
 	}
-	public int getStduyID() {
-		return stduyID;
+
+	public int getStudyId() {
+		return studyId;
 	}
-	public void setStduyID(int stduyID) {
-		this.stduyID = stduyID;
+
+	public void setStudyId(int studyId) {
+		this.studyId = studyId;
 	}
+
 	public String getUserEmail() {
 		return userEmail;
 	}
+
 	public void setUserEmail(String userEmail) {
 		this.userEmail = userEmail;
 	}
+
 	public Date getStudySubmitDt() {
 		return studySubmitDt;
 	}
+
 	public void setStudySubmitDt(Date studySubmitDt) {
 		this.studySubmitDt = studySubmitDt;
 	}
-    
-
 }

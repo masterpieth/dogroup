@@ -15,6 +15,7 @@ import org.springframework.stereotype.Repository;
 import com.dogroup.dto.WalletDTO;
 import com.dogroup.exception.AddException;
 import com.dogroup.exception.FindException;
+import com.dogroup.exception.ModifyException;
 
 @Repository("walletRepository")
 public class WalletRepositoryOracle implements WalletRepository {
@@ -52,41 +53,15 @@ public class WalletRepositoryOracle implements WalletRepository {
 			log.info("selectWallet 끝");
 		}
 	}
-
+	
 	/**
 	 * 
 	 * @param email에  해당하는 사용자의 지갑에 돈을 충전하는 프로시저호출함
 	 * @param balance 잔액을 업데이트함
 	 * @throws Exception
 	 */
-//	@Override
-//	public void updateUserBalance(WalletDTO wallet, int flag) throws Exception {
-//		Connection conn = null;
-//		CallableStatement calStmt = null;
-//		// 지갑 충전 프로시저
-//		try {
-//			conn = MyConnection.getConnection();
-//			conn.setAutoCommit(false);
-//			String procUserWalletSQL = "{call proc_userwallet(?, ?, ?, ?, ?)}";
-//			calStmt = conn.prepareCall(procUserWalletSQL);
-//			calStmt.setInt(1, flag);
-//			calStmt.setString(2, wallet.getEmail());
-//			calStmt.setString(3, wallet.getTransactionUser());
-//			calStmt.setInt(4, 3);
-//			calStmt.setInt(5, wallet.getTransactionMoney());
-//			calStmt.executeUpdate();
-//
-//			conn.commit();
-//
-//		} catch (SQLException e) {
-//			conn.rollback();
-//			e.printStackTrace();
-//		} finally {
-//			MyConnection.close(null, calStmt, conn);
-//		}
-//	}
 	@Override
-	public void updateUserBalance(WalletDTO wallet, int flag) throws Exception {
+	public void updateUserBalance(WalletDTO wallet, int flag) throws ModifyException {
 		
 		log.info("updateUserBalance 시작: email" + wallet.toString() + "/ flag: " + flag);
 		
@@ -103,7 +78,7 @@ public class WalletRepositoryOracle implements WalletRepository {
 			session.update("com.dogroup.mybatis.WalletMapper.updateUserBalance", map);
 		} catch(Exception e) {
 			e.printStackTrace();
-			throw new AddException(e.getMessage());
+			throw new ModifyException(e.getMessage());
 		} finally {
 			if(session != null) {
 				session.close();

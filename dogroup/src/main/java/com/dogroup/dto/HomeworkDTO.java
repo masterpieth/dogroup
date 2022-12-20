@@ -10,16 +10,16 @@ import java.util.List;
  */
 public class HomeworkDTO {
     private int studyId; 	        //스터디 ID
-    private String userEmail;       //회원 ID
+    private String email;       //회원 ID
     private Date studySubmitDt; 	//제출 날짜
 	
     public HomeworkDTO() {
 		super();
 	}
 
-	public HomeworkDTO(int studyId, String userEmail, Date studySubmitDt) {
+	public HomeworkDTO(int studyId, String email, Date studySubmitDt) {
 		this.studyId = studyId;
-		this.userEmail = userEmail;
+		this.email = email;
 		this.studySubmitDt = studySubmitDt;
 	}
 
@@ -31,12 +31,12 @@ public class HomeworkDTO {
 		this.studyId = studyId;
 	}
 
-	public String getUserEmail() {
-		return userEmail;
+	public String getEmail() {
+		return email;
 	}
 
-	public void setUserEmail(String userEmail) {
-		this.userEmail = userEmail;
+	public void setEmail(String email) {
+		this.email = email;
 	}
 
 	public Date getStudySubmitDt() {
@@ -46,4 +46,5 @@ public class HomeworkDTO {
 	public void setStudySubmitDt(Date studySubmitDt) {
 		this.studySubmitDt = studySubmitDt;
 	}
+
 }

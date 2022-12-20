@@ -143,6 +143,6 @@ public interface StudyRepository {
 	 * @param email
 	 * @param i
 	 */
-	void refundToUser(int studyId, String email, int prize);
+	void refundToUser(int studyId, String email, int prize) throws ModifyException;
 
 }

@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.dogroup.dto.WalletDTO;
 import com.dogroup.exception.FindException;
+import com.dogroup.exception.ModifyException;
 
 public interface WalletRepository {
 	/**
@@ -20,7 +21,7 @@ public interface WalletRepository {
 	 * @param wallet User의 현재잔액을 업데이트함
 	 * @throws Exception
 	 */
-	void updateUserBalance(WalletDTO wallet, int flag) throws Exception;
+	void updateUserBalance(WalletDTO wallet, int flag) throws ModifyException;
 
 
 }

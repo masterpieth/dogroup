@@ -24,6 +24,7 @@ import com.dogroup.dto.StudyUserDTO;
 import com.dogroup.dto.UserDTO;
 import com.dogroup.exception.AddException;
 import com.dogroup.exception.FindException;
+import com.dogroup.exception.ModifyException;
 import com.dogroup.exception.RemoveException;
 import com.dogroup.repository.StudyRepository;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -300,7 +301,7 @@ public class StudyService {
 			List<HomeworkDTO> homeworkList = repository.selectHomeworkByStudyId(studyId); // 스터디의 전체 과제 내역을 가져온다.
 
 			for (HomeworkDTO hw : homeworkList) {
-				String hwEmail = hw.getUserEmail();
+				String hwEmail = hw.getEmail();
 				if (!old_user_email.equals(hwEmail)) {
 					user = new StudyUserDTO(studyId, null, new int[totalHomework]);
 					user.setEmail(hwEmail);
@@ -411,8 +412,9 @@ public class StudyService {
 	 * 스터디 종료시 상금을 분배(일괄 정산)한다.
 	 * @param study
 	 * @throws FindException 
+	 * @throws ModifyException 
 	 */
-	public void distributePrizeMoney(int studyId) throws FindException {
+	public void distributePrizeMoney(int studyId) throws FindException, ModifyException {
 		//0. 스터디 정보 가져오기 기본 정보 + 스터디장 userId
 		StudyDTO study = repository.selectStudyByStudyId(studyId);
 		//1. 스터디원 모두의 주차별 출석(유효 과제 상태)을 조회한다.

@@ -185,27 +185,22 @@ public class StudyDTO {
 		this.studyContent = studyContent;
 	}
 
-	
 	public List<StudySubjectDTO> getSubjects() {
 		return subjects;
 	}
 
-	
 	public void setSubjects(List<StudySubjectDTO> subjects) {
 		this.subjects = subjects;
 	}
 
-	
 	public UserDTO getStudyLeader() {
 		return studyLeader;
 	}
 
-	
 	public void setStudyLeader(UserDTO studyLeader) {
 		this.studyLeader = studyLeader;
 	}
 
-	
 	public List<StudyUserDTO> getStudyUsers() {
 		return studyUsers;
 	}
@@ -213,4 +208,5 @@ public class StudyDTO {
 	public void setStudyUsers(List<StudyUserDTO> studyUsers) {
 		this.studyUsers = studyUsers;
 	}
+	
 }

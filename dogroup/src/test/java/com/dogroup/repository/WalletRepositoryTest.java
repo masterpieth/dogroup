@@ -14,14 +14,14 @@ import com.dogroup.dto.WalletDTO;
 public class WalletRepositoryTest {
 
 	@Autowired
-	WalletRepository repository;
+	WalletRepository walletRepository;
 	
 	@Test
 	void 프로시저테스트() throws Exception {
 		WalletDTO wallet = new WalletDTO(0, "user9@gmail.com", 0, null, 0, "기업은행", 3, 1000);
 		int flag = 1;
 		
-		repository.updateUserBalance(wallet, flag);
+		walletRepository.updateUserBalance(wallet, flag);
 	}
 
 }

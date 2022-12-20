@@ -4,6 +4,8 @@ import java.sql.Connection;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.ibatis.session.SqlSession;
+
 import com.dogroup.dto.HomeworkDTO;
 import com.dogroup.dto.StudyDTO;
 import com.dogroup.dto.StudySubjectDTO;
@@ -85,10 +87,10 @@ public interface StudyRepository {
 	void insertStudyUser(StudyDTO study, String email) throws AddException;
 
 	/**
-	 * 스터디장을 insert 한다 - insertStudy에서 connection을 받아서 한 트랜잭션에 있도록 한다. flag 1: 스터디원
-	 * 추가 flag 0: 스터디원 삭제
+	 * 스터디장을 insert 한다
+	 * flag 1: 스터디원 추가 flag 0: 스터디원 삭제
 	 */
-	void insertStudyUserLeader(StudyDTO study, String email, Connection conn) throws AddException;
+	void insertStudyUserLeader(StudyDTO study, SqlSession session) throws AddException;
 
 	/**
 	 * 스터디에서 탈퇴한다 - StudyUser 테이블에서 정보를 제거한다.
@@ -106,7 +108,7 @@ public interface StudyRepository {
 	 * @param conn				insertStudy시의 connection
 	 * @throws AddException		실패시 발생시킬 예외
 	 */
-	void insertStudySubject(StudyDTO study, List<StudySubjectDTO> subjects, Connection conn) throws AddException;
+	void insertStudySubject(StudyDTO study, SqlSession session) throws AddException;
 
 	/**
 	 * 조건에 맞는 스터디 개수를 카운트하여 반환한다. (조건 : 타이틀명, 스터디 정원)

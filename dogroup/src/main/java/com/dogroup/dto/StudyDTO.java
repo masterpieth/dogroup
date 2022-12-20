@@ -11,7 +11,6 @@ import java.util.List;
  */
 public class StudyDTO {
 	private int studyId;					//스터디 ID
-	private String userEmail;				//스터디장
 	private String studyTitle;				//스터디명
 	private int studySize;					//스터디 모집목표 인원
 	private int studyFee;					//스터디 입장료
@@ -33,13 +32,11 @@ public class StudyDTO {
 		super();
 	}
 
-
-	public StudyDTO(int studyId, String userEmail, String studyTitle, int studySize, int studyFee,
+	public StudyDTO(int studyId, String studyTitle, int studySize, int studyFee,
 			int studyCertification, double studyDiligenceCutline, Date studyPostDate, Date studyStartDate,
 			Date studyEndDate, int studyHomeworkPerWeek, int studyPaid, int studyGatheredSize, Clob studyContent) {
 		super();
 		this.studyId = studyId;
-		this.userEmail = userEmail;
 		this.studyTitle = studyTitle;
 		this.studySize = studySize;
 		this.studyFee = studyFee;
@@ -61,13 +58,12 @@ public class StudyDTO {
 		this.studyUsers = studyUsers;
 	}
 	
-	public StudyDTO(int studyId, String userEmail, String studyTitle, int studySize, int studyFee,
+	public StudyDTO(int studyId, String studyTitle, int studySize, int studyFee,
 			int studyCertification, double studyDiligenceCutline, Date studyPostDate, Date studyStartDate,
 			Date studyEndDate, int studyHomeworkPerWeek, int studyPaid, int studyGatheredSize, Clob studyContent,
 			List<StudySubjectDTO> subjects, UserDTO studyLeader, List<StudyUserDTO> studyUsers) {
 		super();
 		this.studyId = studyId;
-		this.userEmail = userEmail;
 		this.studyTitle = studyTitle;
 		this.studySize = studySize;
 		this.studyFee = studyFee;
@@ -91,14 +87,6 @@ public class StudyDTO {
 
 	public void setStudyId(int studyId) {
 		this.studyId = studyId;
-	}
-
-	public String getUserEmail() {
-		return userEmail;
-	}
-
-	public void setUserEmail(String userEmail) {
-		this.userEmail = userEmail;
 	}
 
 	public String getStudyTitle() {

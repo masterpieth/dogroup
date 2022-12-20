@@ -165,23 +165,40 @@
 		WHERE st.study_id= #{studyId}
 	</select>
 
-<select id = "selectStudyUsersByStudyId" resultType = "StudyUserDTO" parameterType="int">
+	<select id = "selectStudyUsersByStudyId" resultType = "StudyUserDTO" parameterType="int">
+	
+	</select>
+	<!-- 스터디원 목록과 스터디원의 회원 정보를 반환한다. -->
+	<select id = "studyUsers" resultType = "StudyUserDTO" parameterType="int">
+
 	SELECT * 
-	FROM study_users 
-	JOIN users 
+	FROM 
+		study_users 
+	JOIN 
+		users 
 	USING (user_email) 
 	WHERE study_id = #{studyId}
-</select>
-
-<insert id= "insertHomeworkByEmail"  parameterType="map">
-
+	</select>
+	
+	<!-- 스터디회원의 과제를 insert한다 -->
+	<insert id= "insertHomeworkByEmail"  parameterType="map">
 	INSERT 
 	INTO 
 	HOMEWORK 
-	VALUES(sysdate, #{studyId}, #{email})
+	VALUES(#{created_at}, #{studyId}, #{email})
+	</insert>
 	
+	<!-- 스터디 과목 수정시 먼저 과목을 삭제한다 -->
+	<delete id="deleteStudySubject" parameterType="int">
+	Delete 
+	FROM 
+		study_subject 
+	WHERE 
+		study_id = #{studyId};
+	</delete>
 
 
-</insert>
-
+	
+	
+	
 </mapper>

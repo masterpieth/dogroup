@@ -82,7 +82,6 @@ public interface StudyRepository {
 
 	/**
 	 * 스터디를 update한다
-	 * 
 	 * @param study 업데이트할 스터디 내용
 	 * @throws ModiftException 업데이트 중 오류시 발생한다.
 	 */
@@ -155,4 +154,12 @@ public interface StudyRepository {
 	 */
 	void refundToUser(int studyId, String email, int prize) throws ModifyException;
 
+	/**
+	 * 스터디원 목록과 스터디원의 회원 정보를 반환한다.
+	 * @author kangb 
+	 * @param studyId
+	 * @throws FindException
+	 */
+	List<StudyUserDTO> studyUsers(int studyId) throws FindException;
+	
 }

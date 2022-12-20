@@ -1,6 +1,12 @@
 package com.dogroup.repository;
 
+import java.sql.CallableStatement;
+import java.sql.Clob;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -8,11 +14,8 @@ import java.util.Map;
 
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
-<<<<<<< Updated upstream
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-=======
->>>>>>> Stashed changes
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -20,6 +23,8 @@ import com.dogroup.dto.HomeworkDTO;
 import com.dogroup.dto.StudyDTO;
 import com.dogroup.dto.StudySubjectDTO;
 import com.dogroup.dto.StudyUserDTO;
+import com.dogroup.dto.SubjectDTO;
+import com.dogroup.dto.UserDTO;
 import com.dogroup.exception.AddException;
 import com.dogroup.exception.FindException;
 import com.dogroup.exception.ModifyException;
@@ -28,15 +33,10 @@ import com.dogroup.exception.RemoveException;
 @Repository("studyRepository")
 public class StudyRepositoryOracle implements StudyRepository {
 	
-<<<<<<< Updated upstream
 	private Logger log = LoggerFactory.getLogger(getClass());
 	
 	@Autowired
 	private SqlSessionFactory sqlSessionFactory;
-=======
-	@Autowired
-	private SqlSessionFactory sqlSessionFactory;
-	
 	
 	/**
 	 * 회원의 이메일로 진행된 모든 스터디 정보를 반환한다. 
@@ -584,6 +584,5 @@ public class StudyRepositoryOracle implements StudyRepository {
 			log.info("refundToUser 끝");
 		}
 	}
-
 	
 }

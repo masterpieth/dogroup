@@ -2,7 +2,11 @@ package com.dogroup.repository;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+<<<<<<< Updated upstream
 import java.util.ArrayList;
+=======
+import java.util.Date;
+>>>>>>> Stashed changes
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -14,36 +18,55 @@ import org.springframework.test.context.ContextConfiguration;
 import com.dogroup.DogroupApplication;
 import com.dogroup.config.MyApplicationContext;
 import com.dogroup.dto.StudyDTO;
+<<<<<<< Updated upstream
 import com.dogroup.dto.StudySubjectDTO;
 import com.dogroup.dto.StudyUserDTO;
 import com.dogroup.dto.SubjectDTO;
+=======
+import com.dogroup.dto.StudyUserDTO;
+>>>>>>> Stashed changes
 import com.dogroup.dto.UserDTO;
 import com.dogroup.exception.AddException;
 import com.dogroup.exception.FindException;
 import com.dogroup.exception.ModifyException;
 
 @SpringBootTest
-@ContextConfiguration(classes = {DogroupApplication.class, MyApplicationContext.class})
+@ContextConfiguration(classes = { DogroupApplication.class, MyApplicationContext.class })
 class StudyRepositoryTest {
 
 	@Autowired
 	StudyRepository studyRepository;
-	
+
 	@Autowired
 	UserRepository userRepository;
+<<<<<<< Updated upstream
 	
 //	@Test
+=======
+
+	// @Test
+	/**
+	 * @author NYK
+	 * @throws ModifyException
+	 * @throws FindException
+	 */
+>>>>>>> Stashed changes
 	void 금액환급() throws ModifyException, FindException {
 		int studyId = 100;
 		String email = "user1@gmail.com";
 		int prize = 100;
-		
+
 		assertThrows(ModifyException.class, () -> studyRepository.refundToUser(studyId, email, prize));
-		
+
 		int studyId2 = 52;
 		int prize2 = 1000;
+<<<<<<< Updated upstream
 		
 		studyRepository.refundToUser(studyId2, email, prize2);
+=======
+
+		studyRepository.refundToUser(studyId, email, prize);
+>>>>>>> Stashed changes
 		UserDTO user = userRepository.selectUserByEmail(email);
 		assertEquals(1003000, user.getUserBalance());
 	}
@@ -126,4 +149,39 @@ class StudyRepositoryTest {
 		StudyDTO study = studyRepository.selectStudyByStudyId(studyId);
 		assertNotNull(study);
 	}
+<<<<<<< Updated upstream
+=======
+
+	/**
+	 * @author kangb
+	 * @return 스터디원목록과 스터디원의 회원정보를 반환하는 Test Case
+	 * @throws FindException
+	 */
+	//@Test
+	void studyUsersTest() throws FindException {
+		int studyId = 52;
+
+		List<StudyUserDTO> list = studyRepository.studyUsers(studyId);
+		assertNotNull(list);
+		assertEquals(1, list.size());
+
+	}
+	
+	@Test
+	/**
+	 * 
+	 * @author kangb
+	 * @throws AddException
+	 */
+	void insertHomeworkByEmail() throws AddException{
+		String email = "user5@gmail.com";
+		int studyId = 54;
+		Date created_at = new Date();
+		studyRepository.insertHomeworkByEmail(email, studyId, created_at);
+		assertNotNull(created_at);
+		
+		
+	}
+
+>>>>>>> Stashed changes
 }

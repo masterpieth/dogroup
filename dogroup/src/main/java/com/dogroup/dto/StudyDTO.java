@@ -1,6 +1,5 @@
 package com.dogroup.dto;
 
-import java.sql.Clob;
 import java.util.Date;
 import java.util.List;
 
@@ -22,7 +21,7 @@ public class StudyDTO {
 	private int studyHomeworkPerWeek;		//스터디 주당 과제 횟수(1~7)
 	private int studyPaid;					//스터디 정산여부(최종 정산)
 	private int studyGatheredSize;			//스터디 현재모집 인원
-	private Clob studyContent;				//스터디 내용(게시글)
+	private String studyContent;				//스터디 내용(게시글)
 	
 	private List<StudySubjectDTO> subjects;	//스터디 과목 리스트(최대 3과목)
 	private UserDTO studyLeader; 			//스터티장 정보
@@ -34,7 +33,7 @@ public class StudyDTO {
 
 	public StudyDTO(int studyId, String studyTitle, int studySize, int studyFee,
 			int studyCertification, double studyDiligenceCutline, Date studyPostDate, Date studyStartDate,
-			Date studyEndDate, int studyHomeworkPerWeek, int studyPaid, int studyGatheredSize, Clob studyContent) {
+			Date studyEndDate, int studyHomeworkPerWeek, int studyPaid, int studyGatheredSize, String studyContent) {
 		super();
 		this.studyId = studyId;
 		this.studyTitle = studyTitle;
@@ -60,7 +59,7 @@ public class StudyDTO {
 	
 	public StudyDTO(int studyId, String studyTitle, int studySize, int studyFee,
 			int studyCertification, double studyDiligenceCutline, Date studyPostDate, Date studyStartDate,
-			Date studyEndDate, int studyHomeworkPerWeek, int studyPaid, int studyGatheredSize, Clob studyContent,
+			Date studyEndDate, int studyHomeworkPerWeek, int studyPaid, int studyGatheredSize, String studyContent,
 			List<StudySubjectDTO> subjects, UserDTO studyLeader, List<StudyUserDTO> studyUsers) {
 		super();
 		this.studyId = studyId;
@@ -177,11 +176,11 @@ public class StudyDTO {
 		this.studyGatheredSize = studyGatheredSize;
 	}
 
-	public Clob getStudyContent() {
+	public String getStudyContent() {
 		return studyContent;
 	}
 
-	public void setStudyContent(Clob studyContent) {
+	public void setStudyContent(String studyContent) {
 		this.studyContent = studyContent;
 	}
 

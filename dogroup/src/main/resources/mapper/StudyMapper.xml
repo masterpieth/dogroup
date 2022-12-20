@@ -3,46 +3,47 @@
   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.dogroup.mybatis.StudyMapper">
-	<resultMap id="studyResultMap" 					type="StudyDTO">
-		<id property="studyId" 						column="study_id"/>
-		<result property="studyTitle" 				column="study_title"/>
-		<result property="studySize" 				column="study_size"/>
-		<result property="studyFee" 				column="study_fee"/>
-		<result property="studyCertification" 		column="study_certification"/>
-		<result property="studyDiligenceCutline"	column="study_diligence_cutline"/>
-		<result property="studyPostDate"			column="study_post_date"/>
-		<result property="studyStartDate" 			column="study_start_date"/>
-		<result property="studyEndDate"				column="study_end_date"/>
-		<result property="studyHomeworkPerWeek" 	column="study_homework_per_week"/>
-		<result property="studyPaid"				column="study_paid"/>
-		<result property="studyGatheredSize" 		column="study_gathered_size"/>
-		<result property="studyContent"				column="study_content"		jdbcType="CLOB"		javaType="java.lang.String"/>
+	<!--StudyDTO ResultMap-->
+	<resultMap id="studyResultMap" 						type="StudyDTO">
+		<id property="studyId" 							column="study_id"/>
+		<result property="studyTitle" 					column="study_title"/>
+		<result property="studySize" 					column="study_size"/>
+		<result property="studyFee" 					column="study_fee"/>
+		<result property="studyCertification" 			column="study_certification"/>
+		<result property="studyDiligenceCutline"		column="study_diligence_cutline"/>
+		<result property="studyPostDate"				column="study_post_date"/>
+		<result property="studyStartDate" 				column="study_start_date"/>
+		<result property="studyEndDate"					column="study_end_date"/>
+		<result property="studyHomeworkPerWeek" 		column="study_homework_per_week"/>
+		<result property="studyPaid"					column="study_paid"/>
+		<result property="studyGatheredSize" 			column="study_gathered_size"/>
+		<result property="studyContent"					column="study_content"/>
 		<!--스터디장-->
-		<association property="studyLeader" 		javaType="UserDTO">
-			<result property="email" 				column="user_email"/>
-			<result property="name" 				column="user_name"/>
-			<result property="diligence"			column="user_diligence"/>
+		<association property="studyLeader" 			javaType="UserDTO">
+			<result property="email" 					column="user_email"/>
+			<result property="name" 					column="user_name"/>
+			<result property="diligence"				column="user_diligence"/>
 		</association>
 		<!--과목 리스트-->
-		<collection property="subjects" 			ofType="StudySubjectDTO">
-			<result property="studyId"				column="study_id"/>
+		<collection property="subjects" 				ofType="StudySubjectDTO">
+			<result property="studyId"					column="study_id"/>
 			<!--과목-->
-			<association property="subject" 		javaType="SubjectDTO">
-				<result property="subjectCode" 		column="subject_code"/>
-				<result property="subjectName" 		column="subject_name"/>
+			<association property="subject" 			javaType="SubjectDTO">
+				<result property="subjectCode" 			column="subject_code"/>
+				<result property="subjectName" 			column="subject_name"/>
 				<!--부모과목-->
-				<association property="subjectParent" 		javaType="SubjectDTO">
+				<association property="subjectParent" 	javaType="SubjectDTO">
 					<result property="subjectCode" 		column="subject_parent_code"/>
 				</association>
 			</association>
 		</collection>
 		<!--스터디원 리스트-->
-		<collection property="studyUsers" 			ofType="StudyUserDTO">
-			<result property="studyId"				column="study_id"/>
+		<collection property="studyUsers" 				ofType="StudyUserDTO">
+			<result property="studyId"					column="study_id"/>
 			<!--숙제 리스트-->
-			<collection property="homeworkList" 	ofType="HomeworkDTO">
-				<result property="userEmail" 		column="user_email"/>
-				<result property="studySubmitDt" 	column="study_submit_dt"/>
+			<collection property="homeworkList" 		ofType="HomeworkDTO">
+				<result property="email" 				column="user_email"/>
+				<result property="studySubmitDt" 		column="study_submit_dt"/>
 			</collection>
 		</collection>
 	</resultMap>
@@ -73,6 +74,95 @@
 		FROM 
 			users
 		WHERE user_email = #{email}
+	</select>
+	
+	<!--스터디 과목을 insert 한다-->
+	<insert id="insertStudySubject" parameterType="java.util.List">
+		<foreach collection="list" item="item" separator=" " open="INSERT ALL" close="SELECT * FROM dual">
+			INTO study_subject (
+				study_id,
+				subject_code
+			) VALUES (
+				#{item.studyId},
+				#{item.subject.subjectCode}
+			)
+		</foreach>
+	</insert>
+	
+	<!--스터디 생성, 생성후 id를 반환한다.-->
+	<insert id="insertStudy" parameterType="StudyDTO">
+		<selectKey keyProperty="studyId" resultType="int" order="AFTER">
+			SELECT study_seq.currval as CURVAL FROM dual
+		</selectKey>
+		INSERT INTO study (
+			study_id,
+			user_email,
+			study_title,
+			study_size,
+			study_fee,
+			study_certification,
+			study_diligence_cutline,
+			study_post_date,
+			study_start_date,
+			study_end_date,
+			study_homework_per_week,
+			study_paid,
+			study_content,
+			study_gathered_size
+		) VALUES (
+			study_seq.nextval,
+			#{studyLeader.email},
+			#{studyTitle},
+			#{studySize},
+			#{studyFee},
+			#{studyCertification},
+			#{studyDiligenceCutline},
+			sysdate,
+			#{studyStartDate},
+			#{studyEndDate},
+			#{studyHomeworkPerWeek},
+			0,
+			#{studyContent},
+			#{studyGatheredSize}
+		)
+	</insert>
+	
+	<!--procWallet을 호출한다.-->
+	<update id="procWallet" parameterType="hashmap" statementType="CALLABLE">
+		{ CALL proc_wallet (
+			#{flag},
+			#{email},
+			#{studyId},
+			#{transactionUser},
+			#{transactionCategory},
+			#{transactionMoney}
+		)}
+	</update>
+	
+	<!--스터디 유저의(개인) 모든 과제 제출 내역을 반환한다.-->
+	<select id="selectUserHomeworkByEmail" parameterType="hashmap" resultType="HomeworkDTO">
+		SELECT
+			study_submit_dt,
+			study_id,
+			user_email
+		FROM
+			homework
+		WHERE
+			study_id = #{studyId}
+			AND user_email = #{email}
+	</select>
+	
+	<!--스터디의 현재 정보를 반환한다.-->
+	<select id="selectStudyByStudyId" parameterType="int" resultMap="studyResultMap">
+		SELECT 
+			st.*, 
+			ss.subject_code,
+			s.subject_name,
+			(SELECT user_diligence FROM users WHERE user_email = st.user_email) user_diligence
+		FROM STUDY st 
+		JOIN study_subject ss ON st.study_id = ss.study_id
+		JOIN subject s ON  ss.subject_code = s.subject_code
+		WHERE st.study_id= #{studyId}
 	</select>
 
 <select id = "selectStudyUsersByStudyId" resultType = "StudyUserDTO" parameterType="int">

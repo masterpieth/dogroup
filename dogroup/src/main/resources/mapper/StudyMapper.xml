@@ -25,27 +25,28 @@
 			<result property="diligence"				column="user_diligence"/>
 		</association>
 		<!--과목 리스트-->
-		<collection property="subjects" 				ofType="StudySubjectDTO">
-			<result property="studyId"					column="study_id"/>
-			<!--과목-->
-			<association property="subject" 			javaType="SubjectDTO">
-				<result property="subjectCode" 			column="subject_code"/>
-				<result property="subjectName" 			column="subject_name"/>
-				<!--부모과목-->
-				<association property="subjectParent" 	javaType="SubjectDTO">
-					<result property="subjectCode" 		column="subject_parent_code"/>
-				</association>
-			</association>
-		</collection>
+		<collection property="subjects" 				resultMap="subjectResultMap"/>
 		<!--스터디원 리스트-->
-		<collection property="studyUsers" 				ofType="StudyUserDTO">
-			<result property="studyId"					column="study_id"/>
+		<collection property="studyUsers" 				ofType="StudyUserDTO"		javaType="ArrayList">
+			<result property="email" 					column="user_email"/>
 			<!--숙제 리스트-->
 			<collection property="homeworkList" 		ofType="HomeworkDTO">
 				<result property="email" 				column="user_email"/>
 				<result property="studySubmitDt" 		column="study_submit_dt"/>
 			</collection>
 		</collection>
+	</resultMap>
+	
+	<resultMap id="subjectResultMap" type="StudySubjectDTO">
+		<!--과목-->
+		<association property="subject" 			javaType="SubjectDTO">
+			<id property="subjectCode" 				column="subject_code"/>
+			<result property="subjectName" 			column="subject_name"/>
+			<!--부모과목-->
+			<association property="subjectParent" 	javaType="SubjectDTO">
+				<result property="subjectCode" 		column="subject_parent_code"/>
+			</association>
+		</association>
 	</resultMap>
 
 	<!--회원에게 스터디 종료에 따른 금액을 환급한다.-->
@@ -154,14 +155,17 @@
 	
 	<!--스터디의 현재 정보를 반환한다.-->
 	<select id="selectStudyByStudyId" parameterType="int" resultMap="studyResultMap">
-		SELECT 
+		SELECT	
 			st.*, 
+			ss.study_id as subject_study_id,
 			ss.subject_code,
 			s.subject_name,
-			(SELECT user_diligence FROM users WHERE user_email = st.user_email) user_diligence
+            u.user_diligence,
+            u.user_name
 		FROM STUDY st 
 		JOIN study_subject ss ON st.study_id = ss.study_id
 		JOIN subject s ON  ss.subject_code = s.subject_code
+        JOIN users u ON st.user_email = u.user_email
 		WHERE st.study_id= #{studyId}
 	</select>
 

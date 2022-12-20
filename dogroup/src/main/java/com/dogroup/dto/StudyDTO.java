@@ -31,25 +31,6 @@ public class StudyDTO {
 		super();
 	}
 
-	public StudyDTO(int studyId, String studyTitle, int studySize, int studyFee,
-			int studyCertification, double studyDiligenceCutline, Date studyPostDate, Date studyStartDate,
-			Date studyEndDate, int studyHomeworkPerWeek, int studyPaid, int studyGatheredSize, String studyContent) {
-		super();
-		this.studyId = studyId;
-		this.studyTitle = studyTitle;
-		this.studySize = studySize;
-		this.studyFee = studyFee;
-		this.studyCertification = studyCertification;
-		this.studyDiligenceCutline = studyDiligenceCutline;
-		this.studyPostDate = studyPostDate;
-		this.studyStartDate = studyStartDate;
-		this.studyEndDate = studyEndDate;
-		this.studyHomeworkPerWeek = studyHomeworkPerWeek;
-		this.studyPaid = studyPaid;
-		this.studyGatheredSize = studyGatheredSize;
-		this.studyContent = studyContent;
-	}
-
 	public StudyDTO(List<StudySubjectDTO> subjects, UserDTO studyLeader, List<StudyUserDTO> studyUsers) {
 		super();
 		this.subjects = subjects;

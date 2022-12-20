@@ -1,22 +1,20 @@
 package com.dogroup.repository;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.test.context.ContextConfiguration;
+
 import com.dogroup.DogroupApplication;
 import com.dogroup.config.MyApplicationContext;
 import com.dogroup.dto.StudyDTO;
-import com.dogroup.dto.StudySubjectDTO;
-import com.dogroup.dto.StudyUserDTO;
-import com.dogroup.dto.SubjectDTO;
 import com.dogroup.dto.StudyUserDTO;
 import com.dogroup.dto.UserDTO;
 import com.dogroup.exception.AddException;
@@ -127,7 +125,7 @@ class StudyRepositoryTest {
 //		StudyDTO study = new StudyDTO();
 //		study.setStudyId(120);
 //		study.setStudyFee(213);
-//		
+		
 //		try {
 //			studyRepository.insertStudyUserLeader(study);
 //		} catch (AddException e) {
@@ -136,9 +134,11 @@ class StudyRepositoryTest {
 //		}
 //	}
 
-//	@Test
+
+	
+	@Test
 	void 스터디정보가져오기() throws FindException {
-		int studyId = 52;
+		int studyId = 55;
 		StudyDTO study = studyRepository.selectStudyByStudyId(studyId);
 		assertNotNull(study);
 	}

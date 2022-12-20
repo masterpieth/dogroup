@@ -117,12 +117,12 @@ public class StudyRepositoryOracle implements StudyRepository {
 		PreparedStatement preStmt = null;
 		ResultSet rs = null;
 		try {
-			String selectStudySQL = "SELECT st.*, --스터디\r\n" 
-					+ "       ss.subject_code, --스터디과목 코드 \r\n"
-					+ "       s.subject_name, --스터디 과목명\r\n"
-					+ "       (SELECT user_diligence FROM users WHERE user_email = st.user_email) diligence --스터디장 성실도\r\n"
-					+ "		  FROM STUDY st JOIN study_subject ss ON st.study_id = ss.study_id\r\n"
-					+ "             JOIN subject s ON  ss.subject_code = s.subject_code             \r\n"
+			String selectStudySQL = "SELECT st.*, "
+					+ "       ss.subject_code, "
+					+ "       s.subject_name, s.subject_parent_code, "
+					+ "       (SELECT user_diligence FROM users WHERE user_email = st.user_email) diligence "
+					+ "		  FROM STUDY st JOIN study_subject ss ON st.study_id = ss.study_id "
+					+ "             JOIN subject s ON  ss.subject_code = s.subject_code "
 					+ "		  WHERE st.study_id= ?";
 			
 			conn = MyConnection.getConnection();
@@ -187,7 +187,7 @@ public class StudyRepositoryOracle implements StudyRepository {
 	 * @author kangb 
 	 * MyBatis로 converting완료
 	 */
-	public List<StudyUserDTO> studyUsers(int studyId) throws FindException {
+	public List<StudyUserDTO> selectStudyUsersByStudyId(int studyId) throws FindException {
 		List<StudyUserDTO> studyUserList = new ArrayList<>();
 		SqlSession session = null;
 		
@@ -195,7 +195,7 @@ public class StudyRepositoryOracle implements StudyRepository {
 		//String selectStudyUserSQL = "select * from study_users join users using (user_email) where study_id = ?";		
 		try {
 			session = sqlSessionFactory.openSession();
-			studyUserList = session.selectList("com.dogroup.mybatis.StudyMapper.studyUsers", studyId);
+			studyUserList = session.selectList("com.dogroup.mybatis.StudyMapper.selectStudyUsersByStudyId", studyId);
 		
 			return studyUserList;
 		} catch (Exception e) {
@@ -507,8 +507,6 @@ public class StudyRepositoryOracle implements StudyRepository {
 			MyConnection.close(null, preStmt, null);
 		}
 	}
-
-
 
 	/**
 	 * 회원의 성실도를 반환한다.

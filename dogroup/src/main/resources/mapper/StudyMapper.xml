@@ -75,7 +75,7 @@
 		WHERE user_email = #{email}
 	</select>
 
-<select id = "studyUsers" resultType = "StudyUserDTO" parameterType="int">
+<select id = "selectStudyUsersByStudyId" resultType = "StudyUserDTO" parameterType="int">
 	SELECT * 
 	FROM study_users 
 	JOIN users 

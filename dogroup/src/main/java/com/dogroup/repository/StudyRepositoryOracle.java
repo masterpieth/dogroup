@@ -1,6 +1,9 @@
 package com.dogroup.repository;
 
+import java.sql.CallableStatement;
+import java.sql.Clob;
 import java.sql.Connection;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -19,6 +22,8 @@ import com.dogroup.dto.HomeworkDTO;
 import com.dogroup.dto.StudyDTO;
 import com.dogroup.dto.StudySubjectDTO;
 import com.dogroup.dto.StudyUserDTO;
+import com.dogroup.dto.SubjectDTO;
+import com.dogroup.dto.UserDTO;
 import com.dogroup.exception.AddException;
 import com.dogroup.exception.FindException;
 import com.dogroup.exception.ModifyException;

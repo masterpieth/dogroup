@@ -164,4 +164,24 @@
 		JOIN subject s ON  ss.subject_code = s.subject_code
 		WHERE st.study_id= #{studyId}
 	</select>
+
+<select id = "selectStudyUsersByStudyId" resultType = "StudyUserDTO" parameterType="int">
+	SELECT * 
+	FROM study_users 
+	JOIN users 
+	USING (user_email) 
+	WHERE study_id = #{studyId}
+</select>
+
+<insert id= "insertHomeworkByEmail"  parameterType="map">
+
+	INSERT 
+	INTO 
+	HOMEWORK 
+	VALUES(sysdate, #{studyId}, #{email})
+	
+
+
+</insert>
+
 </mapper>

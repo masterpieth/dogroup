@@ -54,6 +54,14 @@ public interface StudyRepository {
 	StudyDTO selectStudyByStudyId(int studyId) throws FindException;
 
 	/**
+	 * 스터디원 목록과 스터디원의 회원 정보를 반환한다.
+	 * @param studyId
+	 * @return
+	 * @throws FindException
+	 */
+	List<StudyUserDTO> selectStudyUsersByStudyId(int studyId) throws FindException;
+	
+	/**
 	 * 스터디에 해당하는 제출한 과제를 반환한다.
 	 * 
 	 * @param studyId 스터디아이디

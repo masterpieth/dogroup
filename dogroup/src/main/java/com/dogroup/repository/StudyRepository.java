@@ -1,6 +1,5 @@
 package com.dogroup.repository;
 
-import java.sql.Connection;
 import java.util.Date;
 import java.util.List;
 
@@ -8,7 +7,6 @@ import org.apache.ibatis.session.SqlSession;
 
 import com.dogroup.dto.HomeworkDTO;
 import com.dogroup.dto.StudyDTO;
-import com.dogroup.dto.StudySubjectDTO;
 import com.dogroup.dto.StudyUserDTO;
 import com.dogroup.exception.AddException;
 import com.dogroup.exception.FindException;
@@ -162,4 +160,10 @@ public interface StudyRepository {
 	 */
 	List<StudyUserDTO> studyUsers(int studyId) throws FindException;
 	
+	/**
+	 * 스터디를 삭제한다.
+	 * @param studyId			스터디 ID
+	 * @throws RemoveException
+	 */
+	void deleteStudy(int studyId) throws RemoveException;
 }

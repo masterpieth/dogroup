@@ -1,11 +1,9 @@
 package com.dogroup.repository;
 
-import java.sql.CallableStatement;
 import java.sql.Clob;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -125,71 +123,14 @@ public class StudyRepositoryOracle implements StudyRepository {
 			}
 			return study;
 
-		Connection conn = null;
-		PreparedStatement preStmt = null;
-		ResultSet rs = null;
-		try {
-			String selectStudySQL = "SELECT st.*, --스터디\r\n" + "       ss.subject_code, --스터디과목 코드 \r\n"
-					+ "       s.subject_name, --스터디 과목명\r\n"
-					+ "       (SELECT user_diligence FROM users WHERE user_email = st.user_email) diligence --스터디장 성실도\r\n"
-					+ "		  FROM STUDY st JOIN study_subject ss ON st.study_id = ss.study_id\r\n"
-					+ "             JOIN subject s ON  ss.subject_code = s.subject_code             \r\n"
-					+ "		  WHERE st.study_id= ?";
-
-			conn = MyConnection.getConnection();
-			preStmt = conn.prepareStatement(selectStudySQL);
-			preStmt.setInt(1, studyId);
-			rs = preStmt.executeQuery();
-
-			StudyDTO study = null;
-			if (rs.next()) {
-				study = new StudyDTO();
-				study.setStudyId(rs.getInt("study_id"));
-				study.setUserEmail(rs.getString("user_email"));
-				study.setStudyTitle(rs.getString("study_title"));
-				study.setStudyCertification(rs.getInt("study_certification"));
-				study.setStudySize(rs.getInt("study_size"));
-				study.setStudyFee(rs.getInt("study_fee"));
-				study.setStudyDiligenceCutline(rs.getInt("study_diligence_cutline"));
-				study.setStudyHomeworkPerWeek(rs.getInt("study_homework_per_week"));
-				study.setStudyPostDate(rs.getDate("study_post_date"));
-				study.setStudyStartDate(rs.getDate("study_start_date"));
-				study.setStudyEndDate(rs.getDate("study_end_date"));
-				study.setStudyContent(rs.getClob("study_content"));
-				study.setStudyPaid(rs.getInt("study_paid"));
-				study.setStudyGatheredSize(rs.getInt("study_gathered_size"));
-
-				UserDTO u = new UserDTO();
-				u.setDiligence(rs.getInt("diligence"));
-				u.setEmail(rs.getString("user_email"));
-				study.setStudyLeader(u);
-
-				List<StudySubjectDTO> studySubjectList = new ArrayList<>(); // 스터디 과목 정보를 저장할 LIST
-				StudySubjectDTO studySubject = new StudySubjectDTO(studyId, null); // 스터디 과목 정보를 저장할 객체
-
-				SubjectDTO subject = new SubjectDTO(rs.getString("subject_code"), rs.getString("subject_name"), null);
-				SubjectDTO parentSubject = new SubjectDTO(rs.getString("subject_parent_code"), null, null);
-				subject.setSubjectParent(parentSubject);
-				studySubject.setSubject(subject);
-				studySubjectList.add(studySubject);
-
-				while (rs.next()) {
-					studySubject = new StudySubjectDTO(studyId, null);
-					subject = new SubjectDTO(rs.getString("subject_code"), rs.getString("subject_name"), null);
-					parentSubject = new SubjectDTO(rs.getString("subject_parent_code"), null, null);
-					subject.setSubjectParent(parentSubject);
-					studySubject.setSubject(subject);
-					studySubjectList.add(studySubject);
-				}
-				study.setSubjects(studySubjectList);
-				return study;
-			}
-			throw new FindException();
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new FindException(e.getMessage());
 		} finally {
-			MyConnection.close(rs, preStmt, conn);
+			if(session != null) {
+				session.close();
+			}
+			log.info("selectStudyByStudyId 끝");
 		}
 	}
 
@@ -203,11 +144,9 @@ public class StudyRepositoryOracle implements StudyRepository {
 		log.info("studyUsers 시작 : studyId: " + studyId);
 		List<StudyUserDTO> studyUserList = new ArrayList<>();
 		SqlSession session = null;
-
 		try {
 			session = sqlSessionFactory.openSession();
 			studyUserList = session.selectList("com.dogroup.mybatis.StudyMapper.studyUsers", studyId);
-
 			return studyUserList;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -330,67 +269,15 @@ public class StudyRepositoryOracle implements StudyRepository {
 			insertStudyUserLeader(study, session);
 			
 			insertStudySubject(study, session);
-		}catch{
-			
-		}
-	}
-
-	/*
-	 * 스터디를 Insert 한다. Study와 StudyUser(스터디장)가 한 트랜잭션에 insert되고, 실패시 롤백한다.
-	 * 
-	 * @author kangb MyBatis로 converting 작업 진행중
-	 */
-	@Override
-	public void insertStudy(StudyDTO study) {
-		SqlSession session = null;
-
-		try {
-			session = sqlSessionFactory.openSession();
-
-			String insertStudySQL = "INSERT INTO STUDY VALUES(study_seq.nextval, ?, ?, ?, ?, ?, ?, sysdate, ?, ?, ?, 0, ?, 0)";
-			String insertedSeqSQL = "SELECT study_seq.currval as CURVAL FROM dual";
-
-			// 기본값 셋팅
-			preStmt = conn.prepareStatement(insertStudySQL);
-			preStmt.setString(1, study.getUserEmail());
-			preStmt.setString(2, study.getStudyTitle());
-			preStmt.setInt(3, study.getStudySize());
-			preStmt.setInt(4, study.getStudyFee());
-			preStmt.setInt(5, study.getStudyCertification());
-			preStmt.setDouble(6, study.getStudyDiligenceCutline());
-			preStmt.setDate(7, new java.sql.Date(study.getStudyStartDate().getTime()));
-			preStmt.setDate(8, new java.sql.Date(study.getStudyEndDate().getTime()));
-			preStmt.setInt(9, study.getStudyHomeworkPerWeek());
-			preStmt.setClob(10, study.getStudyContent());
-			preStmt.executeUpdate();
-			preStmt.close();
-			// 스터디 번호 SELECT
-			preStmt = conn.prepareStatement(insertedSeqSQL);
-			rs = preStmt.executeQuery();
-			if (rs.next()) {
-				study.setStudyId(rs.getInt("CURVAL"));
-			}
-			// 스터디장 insert
-			insertStudyUserLeader(study, study.getUserEmail(), conn);
-			// 스터디 과목 insert
-			insertStudySubject(study, study.getSubjects(), conn);
-
-		} catch (Exception e) {
+		}catch (Exception e) {
 			e.printStackTrace();
 			throw new AddException(e.getMessage());
 		} finally {
-
 			if (session != null) {
 				session.close();
 			}
 			log.info("insertStudy 끝");
-
-			if (session != null) {
-				session.close();
-			}
-
 		}
-
 	}
 
 	private void deleteStudySubject(SqlSession session, StudyDTO study) throws RemoveException {
@@ -430,7 +317,6 @@ public class StudyRepositoryOracle implements StudyRepository {
 				session.close();
 			}
 		}
-
 	}
 
 	/**
@@ -715,4 +601,32 @@ public class StudyRepositoryOracle implements StudyRepository {
 		}
 	}
 
+	@Override
+	public List<StudyUserDTO> selectStudyUsersByStudyId(int studyId) throws FindException {
+		return null;
+	}
+
+	/**
+	 * 스터디를 삭제한다. 스터디원, 스터디 과목 삭제 및 환불처리도 진행된다.
+	 */
+	@Override
+	@Transactional(rollbackFor = {RemoveException.class})
+	public void deleteStudy(int studyId) throws RemoveException {
+		log.info("deleteStudy 시작 studyId: " + studyId);
+		SqlSession session = null;
+		StudyDTO study = null;
+		try {
+			session = sqlSessionFactory.openSession();
+			study = selectStudyByStudyId(studyId);
+			session.delete("com.dogroup.mybatis.StudyMapper.deleteStudySubject", studyId);
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new RemoveException(e.getMessage());
+		} finally {
+			if(session != null) {
+				session.close();
+			}
+			log.info("deleteStudy 끝");
+		}
+	}
 }

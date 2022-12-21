@@ -261,26 +261,31 @@ public class StudyRepositoryOracle implements StudyRepository {
 	 * @param study
 	 * @throws RemoveException
 	 */
-	private void deleteStudySubject(SqlSession session, StudyDTO study) throws RemoveException {
-		session.delete("com.dogroup.mybatis.StudyMapper.deleteStudySubject", study.getStudyId());
+	public void deleteStudySubject( SqlSession session, int studyId) throws RemoveException {
+		session.delete("com.dogroup.mybatis.StudyMapper.deleteStudySubject", studyId);
 
 	}
 
 	/**
-	 * 과목삭제와 수정을 동시에 트랜잭션처리한다 스터디의 내용을 update한다.
+	 * 과목삭제와 수정을 동시에 트랜잭션처리한다. 스터디의 과목정보를 update한다.
 	 * 
 	 * @author kangb
 	 */
 	@Override
 	@Transactional(rollbackFor = ModifyException.class)
 	public void updateStudy(StudyDTO study) throws ModifyException {
+		log.info("updateStudy 시작");
 		SqlSession session = null;
 
 		try {
 			session = sqlSessionFactory.openSession();
-
+			
+			StudyDTO dto = new StudyDTO();
+			dto.setStudyId();
 			// 스터디과목 삭제하기
-			deleteStudySubject(session, study);
+			deleteStudySubject(session, dto.getStudyId());
+			
+			//스터디과목 insert하기
 			List<StudySubjectDTO> subjectList = new ArrayList<>();
 			subjectList.addAll(study.getSubjects());
 
@@ -288,7 +293,8 @@ public class StudyRepositoryOracle implements StudyRepository {
 				ssd.setStudyId(study.getStudyId());
 			}
 			session.insert("com.dogroup.mybatis.StudyMapper.insertStudySubject", study.getSubjects());
-
+			insertStudySubject(study, session);
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new ModifyException(e.getMessage());

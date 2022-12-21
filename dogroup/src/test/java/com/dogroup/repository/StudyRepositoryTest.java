@@ -2,14 +2,21 @@ package com.dogroup.repository;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
 
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+
+import java.util.ArrayList;
+
 import java.util.Date;
 import java.util.List;
 
+import org.apache.ibatis.session.SqlSession;
+import org.apache.ibatis.session.SqlSessionFactory;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -19,6 +26,7 @@ import com.dogroup.DogroupApplication;
 import com.dogroup.config.MyApplicationContext;
 import com.dogroup.dto.HomeworkDTO;
 import com.dogroup.dto.StudyDTO;
+import com.dogroup.dto.StudySubjectDTO;
 import com.dogroup.dto.StudyUserDTO;
 import com.dogroup.dto.UserDTO;
 import com.dogroup.exception.AddException;
@@ -36,7 +44,11 @@ class StudyRepositoryTest {
 	@Autowired
 	UserRepository userRepository;
 
+
+	@Autowired
+	private SqlSessionFactory sqlSessionFactory;
 	
+	// @Test
 	/**
 	 * @author NYK
 	 * @throws ModifyException
@@ -103,6 +115,10 @@ class StudyRepositoryTest {
 	 * @throws FindException
 	 */
 //	@Test
+
+	
+	//@Test
+
 	void 스터디정보가져오기() throws FindException {
 		int studyId = 55;
 		StudyDTO study = studyRepository.selectStudyByStudyId(studyId);
@@ -124,9 +140,8 @@ class StudyRepositoryTest {
 
 	}
 
-//	@Test
-	
-	/**
+	//@Test
+	/**Homework를 insert하는 Test Case
 	 * @author kangb
 	 * @throws AddException
 	 */
@@ -138,7 +153,17 @@ class StudyRepositoryTest {
 		assertNotNull(created_at);
 
 	}
-
+	
+	/**
+	 * @author kangb
+	 * 스터디ID에 해당하는 과목들을 삭제하는 Test Case
+	 */
+	@Test
+	 void deleteStudySubject() throws RemoveException{
+		SqlSession session = sqlSessionFactory.openSession();
+		studyRepository.deleteStudySubject(session, 80);		
+	
+	}
 	
 	//@Test
 	void 스터디삭제() {

@@ -167,9 +167,9 @@ public interface StudyRepository {
 	List<StudyUserDTO> selectStudyUsersByStudyId(int studyId) throws FindException;
 	
 	/**
-	 * 스터디를 삭제한다.
-	 * @param studyId			스터디 ID
+	 * 스터디ID에 해당하는 과목들을 삭제한다.
+	 * @param studyDTO	스터디 ID
 	 * @throws RemoveException
 	 */
-	void deleteStudy(int studyId) throws RemoveException;
+	void deleteStudySubject(SqlSession session, int studyId) throws RemoveException;
 }

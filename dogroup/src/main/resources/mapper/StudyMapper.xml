@@ -209,6 +209,7 @@
 			#{item.email}
 		</foreach>
 	</delete>
+	
 	<!--스터디를 삭제한다, 외래키때문에 delete가 불가함, 대신 size를 -1로 변경-->
 	<update id="updateStudyStatus" parameterType="int">
 		UPDATE study
@@ -259,4 +260,116 @@
 			]]>
 	</select>
 	
+	<!-- 스터디의 모든 과제 제출 내역을 반환한다. -->
+	<select id="selectHomeworkByStudyId" parameterType="int" resultType="HomeworkDTO">
+		SELECT
+			*
+		FROM
+			homework
+		WHERE
+			study_id = #{studyId}
+		ORDER BY
+			user_email,
+			study_submit_dt
+	</select>
+	
+	<!-- 회원의 이메일로 진행된 (검색 조건에 맞는)스터디의 갯수를 반환한다. -->
+	<select id="myStudyCount" parameterType="hashmap" resultType="int">
+		
+		SELECT 
+			count(*) 
+		FROM 
+			study
+		WHERE 
+			<if test="studyDTO.studyTitle != null">
+				study_title Like '%'||#{studyDTO.studyTitle}||'%' AND
+			</if>
+			<if test="studyDTO.studyLeader.email != null">
+				user_email Like '%'||#{studyDTO.studyLeader.email}||'%' AND
+			</if>
+			<if test="studyDTO.studySize != 0">
+				study_size = #{studyDTO.studySize} AND
+			</if>
+			<if test="studyDTO.studyDiligenceCutline != 0">
+				 <![CDATA[
+				 	study_diligence_cutline <= #{studyDTO.studyDiligenceCutline} AND
+				 ]]>
+			</if>
+			<if test="studyDTO.studyFee != 0">
+				 <![CDATA[
+				 	study_fee <= #{studyDTO.studyFee} AND
+				 ]]>
+			</if>
+			<if test="studyDTO.studyStartDate != null">
+				 <![CDATA[
+				 	study_start_date >= #{studyDTO.studyStartDate} AND
+				 ]]>
+			</if>
+			<if test="studyDTO.studyEndDate != null">
+				 <![CDATA[
+				 	study_end_date <= #{studyDTO.studyEndDate} AND
+				 ]]>	
+			</if>
+			study_id in (select study_id from study_users WHERE user_email = #{userEmail}) AND
+			<![CDATA[
+				NOT study_size < 0
+			]]>
+	</select>
+	
+	<!-- 회원의 이메일로 진행된 (검색 조건에 맞는)스터디 정보를 반환한다. -->
+	<select id="selectStudyByEmail" parameterType="hashmap" resultMap="studyResultMap">
+		SELECT 
+			st.*,
+			s.subject_code,
+			s.subject_name,
+			s.subject_parent_code,
+			(SELECT user_diligence FROM users WHERE user_email = st.user_email) user_diligence 
+		FROM 
+			(SELECT * FROM 
+				(SELECT rownum rn, a.* FROM 
+					(SELECT * FROM study 
+					 WHERE
+					 	<if test="studyDTO.studyTitle != null">
+							study_title Like '%'||#{studyDTO.studyTitle}||'%' AND
+						</if>
+						<if test="studyDTO.studyLeader != null">
+							<if test="studyDTO.studyLeader.email != null">
+								user_email Like '%'||#{studyDTO.studyLeader.email}||'%' AND
+							</if>
+						</if>
+						<if test="studyDTO.studySize != 0">
+							study_size = #{studyDTO.studySize} AND
+						</if>
+						<if test="studyDTO.studyDiligenceCutline != 0">
+							 <![CDATA[
+							 	study_diligence_cutline <= #{studyDTO.studyDiligenceCutline} AND
+							 ]]>
+						</if>
+						<if test="studyDTO.studyFee != 0">
+							 <![CDATA[
+							 	study_fee <= #{studyDTO.studyFee} AND
+							 ]]>
+						</if>
+						<if test="studyDTO.studyStartDate != null">
+							 <![CDATA[
+							 	study_start_date >= #{studyDTO.studyStartDate} AND
+							 ]]>
+						</if>
+						<if test="studyDTO.studyEndDate != null">
+							 <![CDATA[
+							 	study_end_date <= #{studyDTO.studyEndDate} AND
+							 ]]>	
+						</if>
+						study_id in (select study_id from study_users WHERE user_email = #{userEmail}) AND
+						<![CDATA[
+							NOT study_size < 0
+						]]>
+					ORDER BY study_id) a )
+				WHERE
+					rn 
+				BETWEEN #{startRow} AND #{endRow}
+			) st 
+		JOIN study_subject ss ON st.study_id = ss.study_id 
+		JOIN subject s ON  ss.subject_code = s.subject_code
+	</select>
 </mapper>

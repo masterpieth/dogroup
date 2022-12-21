@@ -26,14 +26,25 @@ public interface StudyRepository {
 	void insertHomeworkByEmail(String email, int studyId, Date created_at) throws AddException;
 
 	/**
-	 * 진행중인 스터디를 검색한다.
-	 * 
-	 * @param email 회원 Email
-	 * @return 스터디 검색 결과 리스트
+	 * 유저의 email로 진행한 (검색 조건에 해당하는)스터디 정보를 반환한다.
+	 * @param currentPage 현재 페이지
+	 * @param cntPerPage 페이당 보여줄 스터디 개수
+	 * @param studyOption 검색 조건을 담고있는 객체
+	 * @param email 유저의 이메일
+	 * @return 검색 조건에 해당하는 스터디 리스트
 	 * @throws FindException
 	 */
-	List<StudyDTO> selectStudyByEmail(String email) throws FindException;
+	List<StudyDTO> selectStudyByEmail(int currentPage, int cntPerPage, StudyDTO studyOption, String email) throws FindException;
 
+	/**
+	 * 유저의 email로 진행한 (검색 조건에 해당하는)스터디의 갯수를 반환한다.
+	 * @param studyOption 검색 조건을 담고있는 객체
+	 * @param email 유저의 이메일
+	 * @return 검색 조건에 해당하는 스터디의 갯수
+	 * @throws FindException
+	 */
+	int myStudyCount(StudyDTO studyOption, String email) throws FindException;
+	
 	/**
 	 * 스터디원의 email로 스터디원의 List<HomeworkDTO> 리스트 반환한다.
 	 * 
@@ -114,21 +125,24 @@ public interface StudyRepository {
 	 * @throws AddException		실패시 발생시킬 예외
 	 */
 	void insertStudySubject(StudyDTO study, SqlSession session) throws AddException;
-
+	
 	/**
-	 * 조건에 맞는 스터디 개수를 카운트하여 반환한다. (조건 : 타이틀명, 스터디 정원)
-	 * 
-	 * @return 개수를 반환
+	 * 검색 조건에 맞는 스터디 리스트를 반환한다.
+	 * @param currentPage 현재 페이지
+	 * @param cntPerPage 페이지당 보여줄 스터디 갯수
+	 * @param studyOption 검색 조건을 담고있는 객체
+	 * @return 검색 조건에 맞는 스터디 리스트
 	 * @throws FindException
 	 */
-	int studyCount(String studyTitle, int studySize) throws FindException;
-
+	List<StudyDTO> selectStudy(int currentPage, int cntPerPage, StudyDTO studyOption) throws FindException;
+	
 	/**
-	 * 검색 조건에 맞는 스터디 리스트를 반환한다. (조건 : 현재 페이지, 페이지당 개수, 타이틀명, 스터디 정원)
-	 * 
-	 * @return 스터디
+	 * 검색 조건에 맞는 스터디의 갯수를 반환한다.
+	 * @param studyOption 검색 조건을 담고있는 객체
+	 * @return 검색 조건에 맞는 스터디의 갯수
+	 * @throws FindException
 	 */
-	List<StudyDTO> selectStudy(int currentPage, int cntPerPage, String studyTitle, int studySize) throws FindException;
+	int studyCount(StudyDTO studyOption) throws FindException;
 	
 	/**
 	 * 회원의 성실도를 반환한다.

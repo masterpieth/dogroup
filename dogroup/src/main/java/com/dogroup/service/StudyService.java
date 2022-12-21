@@ -6,8 +6,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -63,17 +61,33 @@ public class StudyService {
 	}
 
 	/**
-	 * 
-	 * 진행중인 스터디를 검색한다.
-	 * 
-	 * @param email 스터디ID
-	 * @return 스터디 목록
-	 * @throws FindException 진행중인 스터디를 찾지못하면 FindException발생한다.
+	 * 유저가 참여한 (조건에 맞는)스터디 정보를 반환한다. 
+	 * @param currentPage 현재 페이지
+	 * @param cntPerPage 페이지 당 보여줄 리스트 개수
+	 * @param studyOption 스터디 검색 조건을 담고있는 객체
+	 * @param email 유저의 이메일
+	 * @return 조건에 해당하는 스터디 리스트를 반환한다.
+	 * @throws FindException
 	 */
-	public List<StudyDTO> searchMyStudy(String email) throws FindException {
-		return repository.selectStudyByEmail(email);
+	public List<StudyDTO> searchMyStudy(int currentPage, int cntPerPage, StudyDTO studyOption, String email) throws FindException {
+		return repository.selectStudyByEmail(currentPage, cntPerPage, studyOption, email);
 	}
 
+	/**
+	 * 유저가 참여한 (조건에 맞는)스터디 정보를 페이지 빈으로 반환한다.
+	 * @param currentPage 현재 페이지
+	 * @param studyOption 스터디 검색 조건을 담고있는 객체
+	 * @param email 유저의 이메일
+	 * @return 조건에 해당하는 스터디 리스트를 페이지 빈으로 반환한다.
+	 * @throws FindException
+	 */
+	public PageBean<StudyDTO> getPageBeanMy(int currentPage, StudyDTO studyOption, String email) throws FindException {
+		List<StudyDTO> list = searchMyStudy(currentPage, PageBean.CNT_PER_PAGE, studyOption, email);
+		int totalCnt = repository.myStudyCount(studyOption, email);
+		PageBean<StudyDTO> pageBean = new PageBean<>(currentPage, list, totalCnt);
+		return pageBean;
+	}
+	
 	/**
 	 * 스터디를 개설한다. 돈이 없는 경우 개설에 실패한다.
 	 * 
@@ -385,35 +399,33 @@ public class StudyService {
 			throw new FindException(e.getMessage());
 		}
 	}
-	
+
 	/**
-	 * 검색 조건에 맞는 스터디의 리스트와 페이징버튼정보를 페이지빈으로 반환한다.
+	 * 검색 조건에 맞는 스터디 리스트를 반환한다.
 	 * @param currentPage 현재 페이지
-	 * @param studyTitle 검색할 스터디 타이틀명
-	 * @param studySize 검색할 스터디 정원
-	 * @return PageBean<StudyDTO>
+	 * @param cntPerPage 페이지당 보여줄 스터디 개수
+	 * @param studyOption 검색 조건을 담고있는 객체
+	 * @return 검색 조건에 맞는 스터디 리스트
 	 * @throws FindException
 	 */
-	public PageBean<StudyDTO> getPageBean(int currentPage, String studyTitle, int studySize) throws FindException {
-		List<StudyDTO> list = searchStudy(currentPage, PageBean.CNT_PER_PAGE, studyTitle, studySize);
-		int totalCnt = repository.studyCount(studyTitle, studySize);
+	public List<StudyDTO> searchStudy(int currentPage, int cntPerPage, StudyDTO studyOption) throws FindException {
+		return repository.selectStudy(currentPage, cntPerPage, studyOption);
+	}
+	
+	/**
+	 * 검색 조건에 맞는 스터디 리스트를 페이지빈으로 반환한다.
+	 * @param currentPage 현재 페이지
+	 * @param studyOption 검색 조건을 담고있는 객체
+	 * @return 조건에 맞는 스터디 목록의 페이지빈
+	 * @throws FindException
+	 */
+	public PageBean<StudyDTO> getPageBeanAll(int currentPage, StudyDTO studyOption) throws FindException {
+		List<StudyDTO> list = searchStudy(currentPage, PageBean.CNT_PER_PAGE, studyOption);
+		int totalCnt = repository.studyCount(studyOption);
 		PageBean<StudyDTO> pageBean = new PageBean<>(currentPage, list, totalCnt);
 		return pageBean;
 	}
 	
-	/**
-	 * 검색 조건에 맞는 스터디 리스트를 반환한다.
-	 * @param currentPage 현재 페이지
-	 * @param cntPerPage 페이당 목록 개수
-	 * @param studyTitle 검색할 스터디 타이틀명
-	 * @param studySize 검색할 스터디 정원
-	 * @return List<StudyDTO>
-	 * @throws FindException
-	 */
-	public List<StudyDTO> searchStudy(int currentPage, int cntPerPage, String studyTitle, int studySize) throws FindException {
-		return repository.selectStudy(currentPage, cntPerPage, studyTitle, studySize);
-	}
-
 	/**
 	 * 스터디 종료시 상금을 분배(일괄 정산)한다.
 	 * @param study

@@ -280,10 +280,8 @@ public class StudyRepositoryOracle implements StudyRepository {
 		try {
 			session = sqlSessionFactory.openSession();
 			
-			StudyDTO dto = new StudyDTO();
-			dto.setStudyId();
 			// 스터디과목 삭제하기
-			deleteStudySubject(session, dto.getStudyId());
+			deleteStudySubject(session, study.getStudyId());
 			
 			//스터디과목 insert하기
 			List<StudySubjectDTO> subjectList = new ArrayList<>();

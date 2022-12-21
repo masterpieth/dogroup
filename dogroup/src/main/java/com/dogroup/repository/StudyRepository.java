@@ -172,4 +172,9 @@ public interface StudyRepository {
 	 * @throws RemoveException
 	 */
 	void deleteStudySubject(SqlSession session, int studyId) throws RemoveException;
+
+	/**
+	 * 스터디를 삭제한다. 스터디원, 스터디 과목 삭제 및 환불처리도 진행된다.
+	 */
+	void deleteStudy(int studyId) throws RemoveException;
 }

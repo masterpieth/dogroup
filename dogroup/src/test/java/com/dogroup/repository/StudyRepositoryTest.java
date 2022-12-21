@@ -6,7 +6,12 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
 
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+
 import java.util.ArrayList;
+
 import java.util.Date;
 import java.util.List;
 
@@ -19,6 +24,7 @@ import org.springframework.test.context.ContextConfiguration;
 
 import com.dogroup.DogroupApplication;
 import com.dogroup.config.MyApplicationContext;
+import com.dogroup.dto.HomeworkDTO;
 import com.dogroup.dto.StudyDTO;
 import com.dogroup.dto.StudySubjectDTO;
 import com.dogroup.dto.StudyUserDTO;
@@ -38,6 +44,7 @@ class StudyRepositoryTest {
 	@Autowired
 	UserRepository userRepository;
 
+
 	@Autowired
 	private SqlSessionFactory sqlSessionFactory;
 	
@@ -47,7 +54,7 @@ class StudyRepositoryTest {
 	 * @throws ModifyException
 	 * @throws FindException
 	 */
-
+	// @Test
 	void 금액환급() throws ModifyException, FindException {
 		int studyId = 100;
 		String email = "user1@gmail.com";
@@ -66,6 +73,7 @@ class StudyRepositoryTest {
 		assertEquals(1003000, user.getUserBalance());
 	}
 
+	
 	/**
 	 * StudyRepo의 setUserDeligence 동작 테스트
 	 * 
@@ -73,7 +81,7 @@ class StudyRepositoryTest {
 	 * @throws FindException
 	 * @throws ModifyException
 	 */
-//	@Test
+	//@Test
 	void 성실도수정() throws FindException, ModifyException {
 		String email = "user1@gmail.com";
 
@@ -100,49 +108,7 @@ class StudyRepositoryTest {
 		assertEquals(70, diligence);
 	}
 
-	/**
-	 * StudyRepo의 insertStudySubject 테스트
-	 * 
-	 * @author NYK
-	 * @throws AddException
-	 */
-//	@Test
-//	void 스터디과목넣기() {
-//		List<StudySubjectDTO> list = new ArrayList<>();
-//		for(int i=1; i<=3; i++) {
-//			StudySubjectDTO dto = new StudySubjectDTO(52, new SubjectDTO("D000" + i, null, null));
-//			list.add(dto);
-//		}
-//		try {
-//			studyRepository.insertStudySubject(list, null);
-//		} catch (AddException e) {
-//			e.printStackTrace();
-//			fail();
-//		} 
-//	}
-
-	/**
-	 * insertStudyUserLeader 테스트
-	 * 
-	 * @author NYK
-	 * @throws FindException
-	 */
-//	@Test
-//	void 스터디장넣기() {
-//		String email = "user1@gmail.com";
-//		StudyDTO study = new StudyDTO();
-//		study.setStudyId(120);
-//		study.setStudyFee(213);
-		
-//		try {
-//			studyRepository.insertStudyUserLeader(study);
-//		} catch (AddException e) {
-//			e.printStackTrace();
-//			fail();
-//		}
-//	}
-
-
+	
 	/**
 	 * selectStudyByStudyId Test
 	 * @author NYK
@@ -159,6 +125,7 @@ class StudyRepositoryTest {
 		assertNotNull(study);
 	}
 
+	
 	/**
 	 * @author kangb
 	 * @return 스터디원목록과 스터디원의 회원정보를 반환하는 Test Case
@@ -173,12 +140,8 @@ class StudyRepositoryTest {
 
 	}
 
-
-
-
 	//@Test
 	/**Homework를 insert하는 Test Case
-
 	 * @author kangb
 	 * @throws AddException
 	 */
@@ -195,14 +158,12 @@ class StudyRepositoryTest {
 	 * @author kangb
 	 * 스터디ID에 해당하는 과목들을 삭제하는 Test Case
 	 */
-
 	@Test
 	 void deleteStudySubject() throws RemoveException{
 		SqlSession session = sqlSessionFactory.openSession();
 		studyRepository.deleteStudySubject(session, 80);		
 	
 	}
-	
 	
 	//@Test
 	void 스터디삭제() {
@@ -214,12 +175,13 @@ class StudyRepositoryTest {
 		}
 	}
 	
+	
 	/**
 	 * @author KTH
 	 * @throws FindException
 	 * @throws ParseException
 	 */
-	@Test
+	//@Test
 	void studyCount() throws FindException, ParseException {
 		StudyDTO study = new StudyDTO();
 		study.setStudyTitle("스");
@@ -238,5 +200,76 @@ class StudyRepositoryTest {
 		formatDate = dtFormat.parse(strDate);
 		study.setStudyEndDate(formatDate);
 		studyRepository.studyCount(study);
+	}
+
+	/**
+	 * @author Chanmin
+	 * @throws FindException
+	 */
+	//@Test
+	void 스터디의모든과제가져오기() throws FindException {
+		int studyId = 61;
+		List<HomeworkDTO> list = studyRepository.selectHomeworkByStudyId(studyId);
+		assertNotNull(list);
+	}
+	
+	/**
+	 * @author Chanmin
+	 * @throws FindException
+	 */
+	//@Test
+	void 검색조건과회원의이메일로스터디갯수조회하기() throws FindException, ParseException {
+		String email = "user8@gmail.com";
+		
+		StudyDTO study = new StudyDTO();
+		//study.setStudyTitle("스");
+		UserDTO leader = new UserDTO();
+		study.setStudyLeader(leader);
+		study.getStudyLeader().setEmail("@");
+		//study.setStudySize(7);
+		//study.setStudyDiligenceCutline(1000);
+		//study.setStudyFee(10000);
+		
+		String strDate = "20220101";
+		SimpleDateFormat dtFormat = new SimpleDateFormat("yyyyMMdd");
+		Date formatDate = dtFormat.parse(strDate);
+		study.setStudyStartDate(formatDate);
+		
+	//	strDate = "20231231";
+	//	dtFormat = new SimpleDateFormat("yyyyMMdd");
+	//	formatDate = dtFormat.parse(strDate);
+	//	study.setStudyEndDate(formatDate);
+		int Cnt = studyRepository.myStudyCount(study, email);
+		assertNotNull(Cnt);
+	}
+	
+	/**
+	 * @author Chanmin
+	 * @throws FindException
+	 */
+	@Test
+	void 검색조건과회원의이메일로스터디목록조회하기() throws ParseException, FindException {
+	String email = "user8@gmail.com";
+		
+	StudyDTO study = new StudyDTO();
+	//	study.setStudyTitle("스");
+	//	UserDTO leader = new UserDTO();
+	//	study.setStudyLeader(leader);
+	//	study.getStudyLeader().setEmail("@");
+	//	study.setStudySize(8);
+	//	study.setStudyDiligenceCutline(1000);
+	//	study.setStudyFee(10000);
+		
+	//	String strDate = "20220101";
+	//	SimpleDateFormat dtFormat = new SimpleDateFormat("yyyyMMdd");
+	//	Date formatDate = dtFormat.parse(strDate);
+	//	study.setStudyStartDate(formatDate);
+	//	
+	//	strDate = "20231231";
+	//	dtFormat = new SimpleDateFormat("yyyyMMdd");
+	//	formatDate = dtFormat.parse(strDate);
+	//	study.setStudyEndDate(formatDate);
+		List<StudyDTO> list = studyRepository.selectStudyByEmail(1, 5, study, email);
+		assertNotNull(list);
 	}
 }

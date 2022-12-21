@@ -147,8 +147,8 @@ public class StudyRestController {
 	 * @return
 	 * @throws FindException 
 	 */
-	@GetMapping("users/{studyId}/{userEmail}")
-	public ResponseEntity<?> searchStudyUserInfo(@PathVariable int studyId, @PathVariable String email) throws FindException {
+	@GetMapping("users/{studyId}")
+	public ResponseEntity<?> searchStudyUserInfo(@PathVariable int studyId, String email) throws FindException {
 		log.info("searchStudyUserInfo(컨트롤러) 시작: studyId: " + studyId + " /email: " + email);
 		
 		StudyUserDTO studyUser = studyService.searchMyStudyUserInfo(email, studyId);

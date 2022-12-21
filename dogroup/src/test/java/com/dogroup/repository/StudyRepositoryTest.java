@@ -247,7 +247,7 @@ class StudyRepositoryTest {
 	 * @author Chanmin
 	 * @throws FindException
 	 */
-	@Test
+	//@Test
 	void 검색조건과회원의이메일로스터디목록조회하기() throws ParseException, FindException {
 	String email = "user8@gmail.com";
 		
@@ -278,7 +278,7 @@ class StudyRepositoryTest {
 	 * @throws FindException
 	 * @throws ParseException
 	 */
-	@Test
+	//@Test
 	void selectstudy() throws FindException, ParseException {
 		StudyDTO study = new StudyDTO();
 //		study.setStudyTitle("스");
@@ -299,4 +299,9 @@ class StudyRepositoryTest {
 		studyRepository.selectStudy(1,4,study);
 	}
 	
+	//@Test
+	void 현재진행중인깃방식스터조회테스트() throws Exception {
+		String email = "user1@gmail.com";
+		studyRepository.selectCurrentlyStudyByEmail(email);
+	}
 }

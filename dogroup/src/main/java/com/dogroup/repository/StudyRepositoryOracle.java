@@ -571,4 +571,28 @@ public class StudyRepositoryOracle implements StudyRepository {
 			log.info("deleteStudy 끝");
 		}
 	}
+	
+	/**
+	 * 회원의 이메일로 현재 진행중인 깃 방식 스터디를 조회한다. 스터디가 존재하면 FindException을 터뜨린다.
+	 */
+	@Override
+	public void selectCurrentlyStudyByEmail(String email) throws FindException {
+		log.info("selectCurrentlyStudyByEmail 시작 userEmail: " + email);
+		SqlSession session = null;
+		try {
+			session = sqlSessionFactory.openSession();
+			int num = session.selectOne("selectCurrentlyStudyByEmail", email);
+			if(num != 0) {
+				throw new FindException("현재 이미 깃방식의 참여중인 스터디가 있습니다.");
+			}
+		} catch (FindException e) {
+			e.printStackTrace();
+			throw new FindException(e.getMessage());
+		} finally {
+			if (session != null) {
+				session.close();
+			}
+			log.info("selectCurrentlyStudyByEmail 끝");
+		}
+	}
 }

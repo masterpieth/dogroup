@@ -89,30 +89,35 @@ public class StudyService {
 	}
 	
 	/**
-	 * 스터디를 개설한다. 돈이 없는 경우 개설에 실패한다.
-	 * 
+	 * 스터디를 개설한다. 이미 참여중인 스터디(깃방식)가 있거나 돈이 없는 경우 개설에 실패한다.
 	 * @param study
+	 * @throws FindException 
 	 */
-	public void openStudy(StudyDTO study) throws AddException {
-		if (compareUserBalanceWithStudyFee(study.getStudyFee(), study.getStudyLeader().getEmail())) {
+	public void openStudy(StudyDTO study) throws Exception {
+		try {
+			compareUserBalanceWithStudyFee(study.getStudyFee(), study.getStudyLeader().getEmail());
+			IsThereStudiesCurrentlyParticipatingIn(study.getStudyCertification(), study.getStudyLeader().getEmail());
 			repository.insertStudy(study);
-		} else {
-			throw new AddException("스터디를 개설하는데 실패했습니다.");
+		} catch (Exception e) {
+			throw new Exception(e.getMessage());
 		}
 	}
 
 	/**
-	 * 스터디에 참여신청한다. 돈이 없는 경우 또는 성실도가 커트라인보다 낮은 경우 참여에 실패한다.
+	 * 스터디에 참여신청한다. 이미 참여중인 스터디(깃방식)가 있거나 돈이 없는 경우 또는 성실도가 커트라인보다 낮은 경우 참여에 실패한다.
 	 * @param user
 	 * @param study
 	 * @throws AddException
 	 */
-	public void joinStudy(String email, StudyDTO study) throws AddException {
-		if (compareUserBalanceWithStudyFee(study.getStudyFee(), email)
-				&& compareUserDiligenceWithStudyDiligenceCutline(study.getStudyDiligenceCutline(), email)) {
-			repository.insertStudyUser(study, email);
-		} else {
-			throw new AddException("스터디 참여에 실패했습니다");
+	public void joinStudy(String email, StudyDTO study) throws Exception {
+		try {
+		compareUserBalanceWithStudyFee(study.getStudyFee(), email);
+		compareUserDiligenceWithStudyDiligenceCutline(study.getStudyDiligenceCutline(), email);
+		IsThereStudiesCurrentlyParticipatingIn(study.getStudyCertification(), email);
+		repository.insertStudyUser(study, email);
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new Exception(e.getMessage());
 		}
 	}
 
@@ -128,38 +133,58 @@ public class StudyService {
 	}
 
 	/**
-	 * 사용자의 잔액과 입장료를 비교하여 입장을 할 수 있는지 없는지를 반환한다.
-	 * 
-	 * @return 스터디 입장료보다 잔액이 많으면 true / 스터디 입장료보다 잔액이 적어서 입장을 할 수 없으면 false
+	 * 현재 참여중인 스터디중 깃방식으로 과제 제출하는 스터디가 있는지 검사한다.
+	 * @param email
+	 * @throws FindException 참여중인 스터디가 있으면 FindException을 발생시킨다.
 	 */
-	private boolean compareUserBalanceWithStudyFee(int studyFee, String email) {
+	private void IsThereStudiesCurrentlyParticipatingIn(int certification ,String email) throws FindException {
 		try {
-			UserDTO user = userService.searchUserInfo(email);
-			int userBalance = user.getUserBalance();
-			if (userBalance > studyFee) {
-				return true;
+			if(certification == 1) {
+			repository.selectCurrentlyStudyByEmail(email);
 			}
 		} catch (FindException e) {
 			e.printStackTrace();
+			throw new FindException(e.getMessage());
 		}
-		return false;
+	}
+	
+	/**
+	 * 사용자의 잔액과 입장료를 비교하여 입장을 할 수 있는지 없는지를 반환한다.
+	 * 
+	 * @return 스터디 입장료보다 잔액이 많으면 true / 스터디 입장료보다 잔액이 적어서 입장을 할 수 없으면 false
+	 * @throws AddException 
+	 * @throws FindException 
+	 */
+	private void compareUserBalanceWithStudyFee(int studyFee, String email) throws AddException, FindException {
+		try {
+			UserDTO user = userService.searchUserInfo(email);
+			int userBalance = user.getUserBalance();
+			if (userBalance < studyFee) {
+				throw new AddException("스터디 입장에 필요한 잔액이 부족합니다.");
+			}
+		} catch (FindException e) {
+			e.printStackTrace();
+			throw new FindException("회원 정보를 조회할 수 없습니다.");
+		}
 	}
 
 	/**
 	 * 사용자의 성실도와 스터디의 성실도 커트라인을 비교하여 입장을 할 수 있는지 없는지를 반환한다.
 	 * @return 스터디의 성실도 커트라인보다 사용자의 성실도가 높으면 true / 낮으면 false를 반환한다.
+	 * @throws AddException 
+	 * @throws FindException 
 	 */
-	private boolean compareUserDiligenceWithStudyDiligenceCutline(double studyDiligenceCutline, String email) {
+	private void compareUserDiligenceWithStudyDiligenceCutline(double studyDiligenceCutline, String email) throws AddException, FindException {
 		try {
 			UserDTO user = userService.searchUserInfo(email);
 			double userDiligence = user.getDiligence();
-			if (studyDiligenceCutline < userDiligence) {
-				return true;
+			if (studyDiligenceCutline > userDiligence) {
+				throw new AddException("스터디의 성실도 기준에 미달되어 참여할 수 없습니다.");
 			}
 		} catch (FindException e) {
 			e.printStackTrace();
+			throw new FindException("회원 정보를 조회할 수 없습니다.");
 		}
-		return false;
 	}
 
 	/**

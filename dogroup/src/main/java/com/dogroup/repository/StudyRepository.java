@@ -177,4 +177,11 @@ public interface StudyRepository {
 	 * 스터디를 삭제한다. 스터디원, 스터디 과목 삭제 및 환불처리도 진행된다.
 	 */
 	void deleteStudy(int studyId) throws RemoveException;
+
+	/**
+	 * 회원의 이메일로 현재 진행중인 깃 방식 스터디를 조회한다. 
+	 * @param email
+	 * @throws FindException 스터디가 존재하면 FindException을 터뜨린다.
+	 */
+	void selectCurrentlyStudyByEmail(String email) throws FindException;
 }

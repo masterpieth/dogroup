@@ -176,7 +176,6 @@ class StudyRepositoryTest {
 		study.setStudyEndDate(formatDate);
 		studyRepository.studyCount(study);
 	}
-}
 
 	/**
 	 * @author Chanmin
@@ -227,7 +226,7 @@ class StudyRepositoryTest {
 	void 검색조건과회원의이메일로스터디목록조회하기() throws ParseException, FindException {
 	String email = "user8@gmail.com";
 		
-		StudyDTO study = new StudyDTO();
+	StudyDTO study = new StudyDTO();
 	//	study.setStudyTitle("스");
 	//	UserDTO leader = new UserDTO();
 	//	study.setStudyLeader(leader);

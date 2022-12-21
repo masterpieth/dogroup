@@ -50,6 +50,22 @@
 			</collection>
 		</collection>
 	</resultMap>
+	
+	<resultMap  id="studyUsersResultMap" type="StudyUserDTO">
+	<id property="studyId" 							column="study_id"/>
+	<id property="email" 							column="user_email"/>
+		<result property="name" 					column="user_name"/>
+		<result property="diligence"				column="user_diligence"/>
+		<result property="status"                   column="user_status" />
+			<!--스터디원 리스트-->
+		<collection property="homeworkList" 		ofType="HomeworkDTO">
+			<id property="studyId" 					column="study_id"/>
+			<id property="studySubmitDt"			column="study_submit_dt"/>
+			<id property="email" 					column="user_email"/>
+			<result property="email" 					column="user_email"/>
+			
+		</collection>
+	</resultMap>
 
 	<!--회원에게 스터디 종료에 따른 금액을 환급한다.-->
 	<update id="refundToUser" statementType="CALLABLE" parameterType="hashmap">
@@ -171,16 +187,18 @@
 	</select>
 
 	<!-- 스터디원 목록과 스터디원의 회원 정보를 반환한다. -->
-	<select id = "studyUsers" resultType = "StudyUserDTO" parameterType="int">
-
-	SELECT
-		*
+	<select id = "studyUsers" resultMap="studyUsersResultMap" parameterType="int">
+	SELECT su.study_id,
+		   su.user_email,
+		   u.user_name,
+		   u.user_diligence,
+		   u.user_status
 	FROM 
-		study_users 
+		study_users su
 	JOIN 
-		users 
-	USING (user_email) 
-	WHERE study_id = #{studyId}
+		users u
+	ON su.user_email  = u.user_email
+	WHERE su.study_id = #{studyId}
 	</select>
 	
 	<!-- 스터디회원의 과제를 insert한다 -->
@@ -193,13 +211,14 @@
 	
 	<!-- 스터디 과목 수정시 먼저 과목을 삭제한다 -->
 	<delete id="deleteStudySubject" parameterType="int">
-	Delete 
+	DELETE 
 	FROM 
 		study_subject 
 	WHERE 
 		study_id = #{studyId}
 	</delete>
 	
+
 	<!--스터디원을 삭제한다-->
 	<delete id="deleteStudyUser" parameterType="java.util.List">
 			DELETE study_users
@@ -217,4 +236,5 @@
 		WHERE
 			study_id = #{study_id}
 	</update>
+
 </mapper>

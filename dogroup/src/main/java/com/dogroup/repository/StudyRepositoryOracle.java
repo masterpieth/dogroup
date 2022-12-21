@@ -111,7 +111,6 @@ public class StudyRepositoryOracle implements StudyRepository {
 	 */
 	@Override
 	public StudyDTO selectStudyByStudyId(int studyId) throws FindException {
-
 		log.info("selectStudyByStudyId 시작: studyId: " + studyId);
 		SqlSession session = null;
 		StudyDTO study = null;
@@ -196,28 +195,6 @@ public class StudyRepositoryOracle implements StudyRepository {
 	}
 
 	/**
-	 * 스터디회원의 과제를 insert한다 		완료
-	 */
-	@Override
-	public void insertHomeworkByEmail(String email, int studyId, Date created_at) throws AddException {
-		Connection conn = null;
-		PreparedStatement preStmt = null;
-		ResultSet rs = null;
-		try {
-			conn = MyConnection.getConnection();
-			String insertHomeworkByEmailSQL = "INSERT INTO HOMEWORK VALUES(?, ?, ?)";
-			preStmt = conn.prepareStatement(insertHomeworkByEmailSQL);
-			preStmt.setDate(1, new java.sql.Date(created_at.getTime()));
-			preStmt.setInt(2, studyId);
-			preStmt.setString(3, email);
-			preStmt.executeUpdate();
-	/*
-	 * 스터디회원의 과제를 insert한다
-	 * @author kangb
-	 * MyBatis로 converting완료
-	 */
-
-	/**
 	 * 스터디 유저의(개인) 모든 과제 제출 내역을 반환한다. 내역이 없으면 빈 리스트를 반환한다.
 	 * 
 	 * @parama userEmail 유저 email
@@ -251,11 +228,37 @@ public class StudyRepositoryOracle implements StudyRepository {
 		}
 	}
 
+    /**
+     * 스터디회원의 과제를 insert한다
+     * @author kangb
+     * MyBatis로 converting완료
+     */
+    @Override
+    public void insertHomeworkByEmail(String email, int studyId, Date created_at) throws AddException {
+        log.info("insertHomeworkByEmail 시작 email: " + email + "studyId: "+ studyId +"created_at: "+ created_at);
+        SqlSession session = null;
+        try {
+            session = sqlSessionFactory.openSession();
+            Map<String, Object> map = new HashMap<>();
+            map.put("email", email);
+            map.put("studyId", studyId);
+            map.put("created_at", created_at);
+            session.insert("com.dogroup.mybatis.StudyMapper.insertHomeworkByEmail", map);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new AddException("HomeWork Insert 실패");
+        } finally {
+            if (session != null) {
+                session.close();
+            }
+        }
+    }
+    
 	/**
 	 * 스터디를 Insert 한다.
 	 * @throws AddException 
 	 */
-	
 	@Override
 	@Transactional(rollbackFor = AddException.class)
 	public void insertStudy(StudyDTO study) throws AddException {
@@ -280,6 +283,13 @@ public class StudyRepositoryOracle implements StudyRepository {
 		}
 	}
 
+	
+	/**
+	 * 과목을 삭제한다.
+	 * @param session
+	 * @param study
+	 * @throws RemoveException
+	 */
 	private void deleteStudySubject(SqlSession session, StudyDTO study) throws RemoveException {
 		session.delete("com.dogroup.mybatis.StudyMapper.deleteStudySubject", study.getStudyId());
 

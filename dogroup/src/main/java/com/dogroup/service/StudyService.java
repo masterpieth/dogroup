@@ -107,10 +107,10 @@ public class StudyService {
 	 * @param study
 	 * @throws AddException
 	 */
-	public void joinStudy(UserDTO user, StudyDTO study) throws AddException {
-		if (compareUserBalanceWithStudyFee(study.getStudyFee(), user.getEmail())
-				&& compareUserDiligenceWithStudyDiligenceCutline(study.getStudyDiligenceCutline(), user.getEmail())) {
-			repository.insertStudyUser(study, user.getEmail());
+	public void joinStudy(String email, StudyDTO study) throws AddException {
+		if (compareUserBalanceWithStudyFee(study.getStudyFee(), email)
+				&& compareUserDiligenceWithStudyDiligenceCutline(study.getStudyDiligenceCutline(), email)) {
+			repository.insertStudyUser(study, email);
 		} else {
 			throw new AddException("스터디 참여에 실패했습니다");
 		}
@@ -521,5 +521,22 @@ public class StudyService {
 		distributePrizeMoney(studyId);
 		updateStudyUserDiligence(studyId);
 	}
-
+	
+	/**
+	 * 스터디 내용을 수정한다. 성실도 기준 및 입장료는 바뀌지 않는다.
+	 * @param study
+	 * @throws ModifyException 
+	 */
+	public void modifyStudy(StudyDTO study) throws ModifyException {
+		repository.updateStudy(study);
+	}
+	
+	/**
+	 * 스터디를 삭제한다.
+	 * @param studyId
+	 * @throws RemoveException
+	 */
+	public void deleteStudy(int studyId) throws RemoveException {
+		repository.deleteStudy(studyId);
+	}
 }

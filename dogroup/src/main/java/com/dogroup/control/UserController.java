@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,11 +20,18 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.dogroup.dto.UserDTO;
 import com.dogroup.exception.AddException;
+import com.dogroup.exception.ModifyException;
 import com.dogroup.service.UserService;
 import com.dogroup.util.GithubLoginUtil;
 
+/**
+ * User관련 컨트롤러
+ * 로그인시 Redirect를 해줘야할때가 있어 RestController가 될 수 없습니다.
+ * @author NYK
+ *
+ */
 @Controller
-@RequestMapping("/user/")
+@RequestMapping("user/*")
 public class UserController {
 
 	private Logger log = LoggerFactory.getLogger(getClass());
@@ -50,6 +58,19 @@ public class UserController {
 		
 		log.info("login 끝");
 		return new ResponseEntity<>(map, HttpStatus.OK);
+	}
+	
+	/**
+	 * 로그아웃한다.
+	 * @param session
+	 * @return
+	 */
+	@GetMapping("logout")
+	public ResponseEntity<?> logout(HttpSession session) {
+		log.info("logout 시작");
+		session.invalidate();
+		log.info("logout 끝");
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
 	/**
@@ -94,4 +115,21 @@ public class UserController {
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
+	/**
+	 * 회원탈퇴한다.
+	 * @param session
+	 * @return
+	 * @throws ModifyException
+	 */
+	@DeleteMapping("{userEmail}")
+	@ResponseBody
+	public ResponseEntity<?> withdraw(HttpSession session) throws ModifyException {
+		log.info("withdraw 시작");
+		
+		String email = (String) session.getAttribute("loginedId");
+		userService.withdraw(email);
+		
+		log.info("withdraw 끝");
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
 }

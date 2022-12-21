@@ -12,9 +12,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.dogroup.dto.PageBean;
 import com.dogroup.dto.StudyDTO;
 import com.dogroup.dto.StudyUserDTO;
 import com.dogroup.exception.AddException;
@@ -59,10 +61,10 @@ public class StudyRestController {
 	 * @param study
 	 * @param session
 	 * @return
-	 * @throws AddException
+	 * @throws Exception 
 	 */
 	@PostMapping("join/{studyId}")
-	public ResponseEntity<?> joinStudy(@PathVariable int studyId, StudyDTO study, HttpSession session) throws AddException {
+	public ResponseEntity<?> joinStudy(@PathVariable int studyId, StudyDTO study, HttpSession session) throws Exception {
 		log.info("joinStudy(컨트롤러) 시작: studyId: " + studyId);
 		
 		String email = (String) session.getAttribute("loginedId");
@@ -95,10 +97,10 @@ public class StudyRestController {
 	 * 스터디를 개설한다.
 	 * @param study
 	 * @return
-	 * @throws AddException
+	 * @throws Exception 
 	 */
 	@PostMapping
-	public ResponseEntity<?> openStudy(StudyDTO study) throws AddException {
+	public ResponseEntity<?> openStudy(StudyDTO study) throws Exception {
 		log.info("openStudy(컨트롤러) 시작");
 		
 		studyService.openStudy(study);
@@ -191,5 +193,41 @@ public class StudyRestController {
 		
 		log.info("githomework(컨트롤러) 끝");
 		return new ResponseEntity<>(HttpStatus.OK);
+	}
+
+	/**
+	 * 스터디 목록을 조회한다.
+	 * @param currentPage
+	 * @param studyOption
+	 * @return
+	 * @throws FindException
+	 */
+	@GetMapping("list/{currentPage}")
+	public ResponseEntity<?> searchStudy(@PathVariable int currentPage, @RequestBody StudyDTO studyOption) throws FindException {
+		log.info("searchStudy(컨트롤러) 시작: currentPage: " + currentPage);
+		
+		PageBean<StudyDTO> studyList = studyService.getPageBeanAll(currentPage, studyOption);
+		
+		log.info("searchStudy(컨트롤러) 끝");
+		return new ResponseEntity<>(studyList, HttpStatus.OK);
+	}
+	
+	/**
+	 * 진행중인 스터디를 검색한다.
+	 * @param currentPage
+	 * @param studyOption
+	 * @param session
+	 * @return
+	 * @throws FindException
+	 */
+	@GetMapping("my/list/{currentPage}")
+	public ResponseEntity<?> searchMyStudy(@PathVariable int currentPage, @RequestBody StudyDTO studyOption, HttpSession session) throws FindException {
+		log.info("searchMyStudy(컨트롤러) 시작: currentPage: " + currentPage);
+		
+		String email = (String) session.getAttribute("loginedId");
+		PageBean<StudyDTO> studyList = studyService.getPageBeanMy(currentPage, studyOption, email);
+		
+		log.info("searchMyStudy(컨트롤러) 끝");
+		return new ResponseEntity<>(studyList, HttpStatus.OK);
 	}
 }

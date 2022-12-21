@@ -31,8 +31,7 @@ public class UserController {
 	@Autowired
 	private UserService userService;
 	
-	private String backURL = "http://192.168.2.46:8888";							//개발시 본인의 IP로 바꿔 쓰세요
-	private String frontURL = "http://192.168.2.46:5500/src/main/webapp/html/";
+	private String frontURL = "http://192.168.2.46:5500/src/main/webapp/html/";		//개발시 본인의 IP로 바꿔 쓰세요
 	
 	/**
 	 * github 로그인 페이지로 보낸다. github에 로그인이 되어있는 경우에는 바로 githubAuthCallback으로 이동된다.
@@ -94,4 +93,5 @@ public class UserController {
 		log.info("signup 끝");
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
+	
 }

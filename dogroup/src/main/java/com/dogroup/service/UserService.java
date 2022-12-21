@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import com.dogroup.dto.UserDTO;
 import com.dogroup.exception.AddException;
 import com.dogroup.exception.FindException;
+import com.dogroup.exception.ModifyException;
 import com.dogroup.repository.UserRepository;
 
 @Service("userService")
@@ -54,5 +55,14 @@ public class UserService {
 			e.printStackTrace();
 			throw new FindException(e.getMessage());
 		}
+	}
+	
+	/**
+	 * 회원탈퇴한다.
+	 * @param email
+	 * @throws ModifyException
+	 */
+	public void withdraw(String email) throws ModifyException {
+		repository.updateUserStatus(email);
 	}
 }

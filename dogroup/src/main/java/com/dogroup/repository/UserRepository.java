@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import com.dogroup.dto.UserDTO;
 import com.dogroup.exception.AddException;
 import com.dogroup.exception.FindException;
+import com.dogroup.exception.ModifyException;
 
 public interface UserRepository {
 	
@@ -23,6 +24,12 @@ public interface UserRepository {
 	 * @throws SQLException
 	 * @throws Exception
 	 */
-	
 	UserDTO selectUserByEmail(String email) throws FindException;
+	
+	/**
+	 * 회원 탈퇴처리한다.
+	 * @param email
+	 * @throws ModifyException
+	 */
+	void updateUserStatus(String email) throws ModifyException;
 }

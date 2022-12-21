@@ -3,6 +3,7 @@ package com.dogroup.repository;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.Date;
 import java.util.List;
@@ -20,6 +21,7 @@ import com.dogroup.dto.UserDTO;
 import com.dogroup.exception.AddException;
 import com.dogroup.exception.FindException;
 import com.dogroup.exception.ModifyException;
+import com.dogroup.exception.RemoveException;
 
 @SpringBootTest
 @ContextConfiguration(classes = { DogroupApplication.class, MyApplicationContext.class })
@@ -135,8 +137,12 @@ class StudyRepositoryTest {
 //	}
 
 
-	
-	@Test
+	/**
+	 * selectStudyByStudyId Test
+	 * @author NYK
+	 * @throws FindException
+	 */
+//	@Test
 	void 스터디정보가져오기() throws FindException {
 		int studyId = 55;
 		StudyDTO study = studyRepository.selectStudyByStudyId(studyId);
@@ -148,17 +154,16 @@ class StudyRepositoryTest {
 	 * @return 스터디원목록과 스터디원의 회원정보를 반환하는 Test Case
 	 * @throws FindException
 	 */
-	// @Test
+//	 @Test
 	void studyUsersTest() throws FindException {
 		int studyId = 52;
-
-		List<StudyUserDTO> list = studyRepository.studyUsers(studyId);
+		List<StudyUserDTO> list = studyRepository.selectStudyUsersByStudyId(studyId);
 		assertNotNull(list);
 		assertEquals(1, list.size());
 
 	}
 
-	@Test
+//	@Test
 	/**
 	 * @author kangb
 	 * @throws AddException
@@ -172,4 +177,13 @@ class StudyRepositoryTest {
 
 	}
 
+	@Test
+	void 스터디삭제() {
+		try {
+			studyRepository.deleteStudy(79);
+		} catch (RemoveException e) {
+			e.printStackTrace();
+			fail();
+		}
+	}
 }

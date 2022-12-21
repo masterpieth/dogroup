@@ -216,7 +216,7 @@ public class StudyRepositoryOracle implements StudyRepository {
 	 * @author kangb MyBatis로 converting완료
 	 */
 	@Override
-	public List<StudyUserDTO> studyUsers(int studyId) throws FindException {
+	public List<StudyUserDTO> selectStudyUsersByStudyId(int studyId) throws FindException {
 		log.info("studyUsers 시작 : studyId: " + studyId);
 		List<StudyUserDTO> studyUserList = new ArrayList<>();
 		SqlSession session = null;
@@ -731,11 +731,6 @@ public class StudyRepositoryOracle implements StudyRepository {
 		}
 	}
 
-	@Override
-	public List<StudyUserDTO> selectStudyUsersByStudyId(int studyId) throws FindException {
-		return null;
-	}
-
 	/**
 	 * 스터디를 삭제한다. 스터디원, 스터디 과목 삭제 및 환불처리도 진행된다.
 	 */
@@ -743,12 +738,21 @@ public class StudyRepositoryOracle implements StudyRepository {
 	@Transactional(rollbackFor = {RemoveException.class})
 	public void deleteStudy(int studyId) throws RemoveException {
 		log.info("deleteStudy 시작 studyId: " + studyId);
+		
 		SqlSession session = null;
-		StudyDTO study = null;
 		try {
 			session = sqlSessionFactory.openSession();
-			study = selectStudyByStudyId(studyId);
+			StudyDTO study = selectStudyByStudyId(studyId);
+			List<StudyUserDTO> list = selectStudyUsersByStudyId(studyId);
+			
+			//스터디원탈퇴처리
+			for(StudyUserDTO su : list) {
+				deleteStudyUser(study, su.getEmail());
+			}
+			//과목삭제
 			session.delete("com.dogroup.mybatis.StudyMapper.deleteStudySubject", studyId);
+			//스터디삭제: 외래키때문에 delete가 불가함, 대신 size를 -1로 변경
+			session.delete("com.dogroup.mybatis.StudyMapper.updateStudyStatus", studyId);
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new RemoveException(e.getMessage());

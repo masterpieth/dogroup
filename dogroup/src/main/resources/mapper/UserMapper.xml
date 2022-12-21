@@ -11,6 +11,7 @@
 		<result property="userBalance" column="user_balance"/>
 		<result property="status" column="user_status"/>
 	</resultMap>
+	<!--사용자 정보 가져오기-->
 	<select id="selectUserByEmail" parameterType="String" resultMap="userMap">
 		SELECT
 			*
@@ -18,6 +19,7 @@
 		WHERE
 			user_email = #{userEmail}
 	</select>
+	<!--회원가입-->
 	<insert id="insertUser" parameterType="UserDTO">
 		INSERT INTO users(
 			user_email,
@@ -35,4 +37,12 @@
 			1
 		)
 	</insert>
+	<!--회원삭제-->
+	<update id="updateUserStatus" parameterType="String">
+		UPDATE users
+		SET
+			user_status = 0
+		WHERE
+			user_email = #{email}
+	</update>
 </mapper>

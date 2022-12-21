@@ -213,6 +213,30 @@ class StudyRepositoryTest {
 			fail();
 		}
 	}
-
 	
+	/**
+	 * @author KTH
+	 * @throws FindException
+	 * @throws ParseException
+	 */
+	@Test
+	void studyCount() throws FindException, ParseException {
+		StudyDTO study = new StudyDTO();
+		study.setStudyTitle("스");
+		UserDTO leader = new UserDTO();
+		study.setStudyLeader(leader);
+		study.getStudyLeader().setEmail("@");
+		study.setStudySize(7);
+		study.setStudyDiligenceCutline(1000);
+		study.setStudyFee(10000);
+		String strDate = "20220101";
+		SimpleDateFormat dtFormat = new SimpleDateFormat("yyyyMMdd");
+		Date formatDate = dtFormat.parse(strDate);
+		study.setStudyStartDate(formatDate);
+		strDate = "20231231";
+		dtFormat = new SimpleDateFormat("yyyyMMdd");
+		formatDate = dtFormat.parse(strDate);
+		study.setStudyEndDate(formatDate);
+		studyRepository.studyCount(study);
+	}
 }

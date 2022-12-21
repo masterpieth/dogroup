@@ -3,6 +3,8 @@ package com.dogroup.control;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
@@ -81,7 +83,7 @@ public class UserController {
 	 * @throws Exception
 	 */
 	@GetMapping("auth/github/callback")
-	public String githubAuthCallback(String code, HttpSession session) throws Exception {
+	public String githubAuthCallback(String code, HttpSession session, HttpServletResponse response) throws Exception {
 		log.info("github auth callback 시작 - 1회용 code: " + code);
 		
 		String accessToken = GithubLoginUtil.getAccessToken(code);
@@ -92,9 +94,9 @@ public class UserController {
 			redirectURL = frontURL + "user_signup.html?email=" + email;
 		} else {
 			session.setAttribute("loginedId", email);
-			redirectURL = frontURL + "index.html";
+			redirectURL = frontURL + "index.html?email=" + email;
 		}
-		log.info("github auth callback 끝");
+		log.info("github auth callback 끝 redirectURL: " + redirectURL);
 		return "redirect:" + redirectURL;
 	}
 	
@@ -121,7 +123,7 @@ public class UserController {
 	 * @return
 	 * @throws ModifyException
 	 */
-	@DeleteMapping("{userEmail}")
+	@DeleteMapping
 	@ResponseBody
 	public ResponseEntity<?> withdraw(HttpSession session) throws ModifyException {
 		log.info("withdraw 시작");

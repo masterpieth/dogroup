@@ -625,38 +625,21 @@ public class StudyRepositoryOracle implements StudyRepository {
 	 * 검색 조건에 맞는 스터디 개수를 카운트하여 반환한다.
 	 */
 	@Override
-	public int studyCount(StudyDTO studyOption) throws FindException {
-		Connection conn = null;
-		PreparedStatement preStmt = null;
-		ResultSet rs = null;
-		String studyStudyCountSQL = null;
+	public int studyCount(StudyDTO studyDTO) throws FindException {
+		log.info("studyCount  시작");
+		SqlSession session = null;
 		try {
-			conn = MyConnection.getConnection();
-			studyStudyCountSQL = "SELECT count(*) FROM study "
-								+ "WHERE study_title Like ? "
-								+ "AND user_email Like ? "
-								+ "AND study_size = ? "
-								+ "AND study.STUDY_DILIGENCE_CUTLINE <= ? "
-								+ "AND study_fee <= ? "
-								+ "AND study_start_date >= ? "
-								+ "AND study_end_date <= ? ";
-			preStmt = conn.prepareStatement(studyStudyCountSQL);
-			preStmt.setString(1, "%" + studyOption.getStudyTitle()+ "%");
-			preStmt.setString(2, "%" + studyOption.getStudyLeader().getEmail() + "%");
-			preStmt.setInt(3, studyOption.getStudySize());
-			preStmt.setDouble(4, studyOption.getStudyDiligenceCutline());
-			preStmt.setInt(5, studyOption.getStudyFee());
-			preStmt.setDate(6, new java.sql.Date(studyOption.getStudyStartDate().getTime()));
-			preStmt.setDate(7, new java.sql.Date(studyOption.getStudyEndDate().getTime()));
-			rs = preStmt.executeQuery();
-			rs.next();
-			int count = rs.getInt(1);
+			session = sqlSessionFactory.openSession();
+			int count = session.selectOne("studyCount",studyDTO);
 			return count;
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new FindException(e.getMessage());
 		} finally {
-			MyConnection.close(rs, preStmt, conn);
+			if (session != null) {
+				session.close();
+			}
+		log.info("studyCount 종료");
 		}
 	}
 

@@ -38,8 +38,9 @@ class StudyRepositoryTest {
 	@Autowired
 	UserRepository userRepository;
 
-//	@Test
-
+	@Autowired
+	private SqlSessionFactory sqlSessionFactory;
+	
 	// @Test
 	/**
 	 * @author NYK
@@ -194,13 +195,14 @@ class StudyRepositoryTest {
 	 * @author kangb
 	 * 스터디ID에 해당하는 과목들을 삭제하는 Test Case
 	 */
-	/*
+
 	@Test
 	 void deleteStudySubject() throws RemoveException{
-		SqlSession session = SqlSessionFactory
+		SqlSession session = sqlSessionFactory.openSession();
 		studyRepository.deleteStudySubject(session, 80);		
+	
 	}
-	*/
+	
 	
 	//@Test
 	void 스터디삭제() {

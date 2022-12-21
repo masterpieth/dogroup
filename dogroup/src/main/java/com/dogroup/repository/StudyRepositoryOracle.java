@@ -415,8 +415,29 @@ public class StudyRepositoryOracle implements StudyRepository {
 	 * 검색 조건에 맞는 스터디 리스트를 반환한다.
 	 */
 	@Override
-	public List<StudyDTO> selectStudy(int currentPage, int cntPerPage, StudyDTO studyOption) throws FindException {
-		
+	public List<StudyDTO> selectStudy(int currentPage, int cntPerPage, StudyDTO studyDTO) throws FindException {
+		log.info("selectStudy 시작");
+		List<StudyDTO> list = new ArrayList<>();
+		SqlSession session = null;
+		int startRow = currentPage * cntPerPage - cntPerPage + 1;
+		int endRow = currentPage * cntPerPage;
+		Map<String, Object> map = new HashMap<>();
+		map.put("startRow", startRow);
+		map.put("endRow", endRow);
+		map.put("studyDTO",studyDTO);
+		try {
+			session = sqlSessionFactory.openSession();
+			list = session.selectList("selectStudy",map);
+			return list;
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new FindException(e.getMessage());
+		} finally {
+			if (session != null) {
+				session.close();
+		}
+			log.info("selectStudy 종료");
+		}
 	}
 
 	/**

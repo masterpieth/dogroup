@@ -272,4 +272,31 @@ class StudyRepositoryTest {
 		List<StudyDTO> list = studyRepository.selectStudyByEmail(1, 5, study, email);
 		assertNotNull(list);
 	}
+	
+	/**
+	 * @author KTH
+	 * @throws FindException
+	 * @throws ParseException
+	 */
+	@Test
+	void selectstudy() throws FindException, ParseException {
+		StudyDTO study = new StudyDTO();
+//		study.setStudyTitle("스");
+		UserDTO leader = new UserDTO();
+		study.setStudyLeader(leader);
+//		study.getStudyLeader().setEmail("@");
+//		study.setStudySize(7);
+//		study.setStudyDiligenceCutline(1000);
+//		study.setStudyFee(10000);
+		String strDate = "20220101";
+		SimpleDateFormat dtFormat = new SimpleDateFormat("yyyyMMdd");
+		Date formatDate = dtFormat.parse(strDate);
+		study.setStudyStartDate(formatDate);
+		strDate = "20231231";
+		dtFormat = new SimpleDateFormat("yyyyMMdd");
+		formatDate = dtFormat.parse(strDate);
+		study.setStudyEndDate(formatDate);
+		studyRepository.selectStudy(1,4,study);
+	}
+	
 }

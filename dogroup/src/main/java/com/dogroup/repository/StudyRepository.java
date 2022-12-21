@@ -34,7 +34,7 @@ public interface StudyRepository {
 	 * @return 검색 조건에 해당하는 스터디 리스트
 	 * @throws FindException
 	 */
-	List<StudyDTO> selectStudyByEmail(int currentPage, int cntPerPage, StudyDTO studyOption, String email) throws FindException;
+	List<StudyDTO> selectStudyByEmail(int currentPage, int cntPerPage, StudyDTO studyDTO, String email) throws FindException;
 
 	/**
 	 * 유저의 email로 진행한 (검색 조건에 해당하는)스터디의 갯수를 반환한다.
@@ -43,7 +43,7 @@ public interface StudyRepository {
 	 * @return 검색 조건에 해당하는 스터디의 갯수
 	 * @throws FindException
 	 */
-	int myStudyCount(StudyDTO studyOption, String email) throws FindException;
+	int myStudyCount(StudyDTO studyDTO, String email) throws FindException;
 	
 	/**
 	 * 스터디원의 email로 스터디원의 List<HomeworkDTO> 리스트 반환한다.

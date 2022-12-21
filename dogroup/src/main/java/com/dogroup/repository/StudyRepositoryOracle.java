@@ -28,6 +28,7 @@ import com.dogroup.exception.AddException;
 import com.dogroup.exception.FindException;
 import com.dogroup.exception.ModifyException;
 import com.dogroup.exception.RemoveException;
+import com.my.sql.MyConnection;
 
 @Repository("studyRepository")
 public class StudyRepositoryOracle implements StudyRepository {
@@ -38,66 +39,142 @@ public class StudyRepositoryOracle implements StudyRepository {
 	private SqlSessionFactory sqlSessionFactory;
 
 	/**
-	 * 회원의 이메일로 진행된 모든 스터디 정보를 반환한다.
+	 * 회원의 이메일로 진행된 (검색 조건에 맞는)스터디 정보를 반환한다.
 	 */
 	@Override
-	public List<StudyDTO> selectStudyByEmail(String email) throws FindException {
-		List<StudyDTO> list = new ArrayList<>();
-		Connection conn = null;
-		PreparedStatement preStmt = null;
-		ResultSet rs = null;
-		try {
-			conn = MyConnection.getConnection();
-			String selectStudyByEmailSQL = "SELECT st.*, s.subject_name, s.subject_parent_code "
-					+ "FROM STUDY st JOIN study_subject ss ON st.study_id = ss.study_id "
-					+ "JOIN subject s ON  ss.subject_code = s.subject_code " + "WHERE st.user_email = ?";
-			preStmt = conn.prepareStatement(selectStudyByEmailSQL);
-			preStmt.setString(1, email);
-			rs = preStmt.executeQuery();
-
-			while (rs.next()) {
-				int studyId = rs.getInt("study_id");
-				String userEmail = rs.getString("user_email");
-				String studyTitle = rs.getString("study_title");
-				int studySize = rs.getInt("study_size");
-				int studyFee = rs.getInt("study_fee");
-				int studyCertification = rs.getInt("study_certification");
-				int studyDiligenceCutline = rs.getInt("study_diligence_cutline");
-				Date studyPostDate = rs.getDate("study_post_date");
-				Date studyStartDate = rs.getDate("study_start_date");
-				Date studyEndDate = rs.getDate("study_end_date");
-				int studyHomeworkPerWeek = rs.getInt("study_homework_per_week");
-				int studyPaid = rs.getInt("study_paid");
-				int studyGatheredSize = rs.getInt("study_gathered_size");
-				Clob studyContent = rs.getClob("study_content");
-
-				StudyDTO study = new StudyDTO(studyId, userEmail, studyTitle, studySize, studyFee, studyCertification,
-						studyDiligenceCutline, studyPostDate, studyStartDate, studyEndDate, studyHomeworkPerWeek,
-						studyPaid, studyGatheredSize, studyContent);
-
-				List<StudySubjectDTO> studySubjectList = new ArrayList<>(); // 스터디 과목 정보를 저장할 LIST
-				StudySubjectDTO studySubject = new StudySubjectDTO(studyId, null); // 스터디 과목 정보를 저장할 객체
-
-				SubjectDTO subject = new SubjectDTO(rs.getString("subject_code"), rs.getString("subject_name"), null);
-				SubjectDTO parentSubject = new SubjectDTO(rs.getString("subject_parent_code"), null, null);
+	public List<StudyDTO> selectStudyByEmail(int currentPage, int cntPerPage, StudyDTO studyOption, String email) throws FindException {
+	Connection conn = null;
+	PreparedStatement preStmt = null;
+	ResultSet rs = null;
+	List<StudyDTO> list = new ArrayList<>();
+	String studyStudySQL = null;
+	int startRow = currentPage * cntPerPage - cntPerPage + 1;
+	int endRow = currentPage * cntPerPage;
+	try {
+		conn = MyConnection.getConnection();
+		studyStudySQL = "SELECT st.*, s.subject_code, s.subject_name, s.subject_parent_code,(SELECT user_diligence FROM users WHERE user_email = st.user_email) diligence FROM "
+						+ "(SELECT * FROM "
+						+ "(SELECT rownum rn, a.* FROM "
+						+ "(SELECT * FROM study "
+						+ "WHERE study_title Like ? "
+						+ "AND user_email Like ? "
+						+ "AND study_size = ? "
+						+ "AND study_diligence_cutline <= ? "
+						+ "AND study_fee <= ? "
+						+ "AND study_start_date >= ? "
+						+ "AND study_end_date <= ? "
+						+ "AND study_id in (select study_id from study_users WHERE user_email = ?) "
+						+ "order by study_id) a "
+						+ ")WHERE rn BETWEEN ? AND ?) st "
+						+ "JOIN study_subject ss ON st.study_id = ss.study_id "
+						+ "JOIN subject s ON  ss.subject_code = s.subject_code";
+		preStmt = conn.prepareStatement(studyStudySQL);
+		preStmt.setString(1, "%" + studyOption.getStudyTitle()+ "%");
+		preStmt.setString(2, "%" + studyOption.getStudyLeader().getEmail() + "%");
+		preStmt.setInt(3, studyOption.getStudySize());
+		preStmt.setDouble(4, studyOption.getStudyDiligenceCutline());
+		preStmt.setInt(5, studyOption.getStudyFee());
+		preStmt.setDate(6, new java.sql.Date(studyOption.getStudyStartDate().getTime()));
+		preStmt.setDate(7, new java.sql.Date(studyOption.getStudyEndDate().getTime()));
+		preStmt.setString(8, email);
+		preStmt.setInt(9, startRow);
+		preStmt.setInt(10, endRow);
+		
+		int oldRN = 0;
+		int newRN = 0;
+		StudyDTO study = null;
+		StudySubjectDTO studySubject = null;
+		List<StudySubjectDTO> studySubjectList = null;
+		SubjectDTO subject = null;
+		SubjectDTO parentSubject = null;
+		
+		rs = preStmt.executeQuery();
+		while (rs.next()) {
+			newRN = rs.getInt("rn");	
+			if(oldRN != newRN) { //같은 스터디를 가르키는지 확인(과목 정보만 바뀐 같은 스터디인가?)
+				study = new StudyDTO();
+				//스터디의 기본정보				
+				study.setStudyId(rs.getInt("study_id"));
+				study.setStudyTitle(rs.getString("study_title"));
+				study.setStudyCertification(rs.getInt("study_certification"));
+				study.setStudySize(rs.getInt("study_size"));
+				study.setStudyFee(rs.getInt("study_fee"));
+				study.setStudyDiligenceCutline(rs.getInt("study_diligence_cutline"));
+				study.setStudyHomeworkPerWeek(rs.getInt("study_homework_per_week"));
+				study.setStudyPostDate(rs.getDate("study_post_date"));
+				study.setStudyStartDate(rs.getDate("study_start_date"));
+				study.setStudyEndDate(rs.getDate("study_end_date"));
+				study.setStudyContent(rs.getClob("study_content"));
+				study.setStudyPaid(rs.getInt("study_paid"));
+				study.setStudyGatheredSize(rs.getInt("study_gathered_size"));
+				//스터디장의 정보
+				UserDTO u = new UserDTO();
+				u.setDiligence(rs.getInt("diligence"));
+				u.setEmail(rs.getString("user_email"));
+				study.setStudyLeader(u);
+				//스터디의 과목정보
+				studySubjectList = new ArrayList<>();
+				studySubject = new StudySubjectDTO(study.getStudyId(), null);
+				subject = new SubjectDTO(rs.getString("subject_code"), rs.getString("subject_name"), null);
+				parentSubject = new SubjectDTO(rs.getString("subject_parent_code"), null, null);
 				subject.setSubjectParent(parentSubject);
 				studySubject.setSubject(subject);
 				studySubjectList.add(studySubject);
-
-				while (rs.next()) {
-					studySubject = new StudySubjectDTO(studyId, null);
-					subject = new SubjectDTO(rs.getString("subject_code"), rs.getString("subject_name"), null);
-					parentSubject = new SubjectDTO(rs.getString("subject_parent_code"), null, null);
-					subject.setSubjectParent(parentSubject);
-					studySubject.setSubject(subject);
-					studySubjectList.add(studySubject);
-				}
 				study.setSubjects(studySubjectList);
-
+				//리스트에 추가
 				list.add(study);
+				oldRN = newRN;
+			} else {
+				//스터디의 과목정보만 추가
+				studySubject = new StudySubjectDTO(study.getStudyId(), null);
+				subject = new SubjectDTO(rs.getString("subject_code"), rs.getString("subject_name"), null);
+				parentSubject = new SubjectDTO(rs.getString("subject_parent_code"), null, null);
+				subject.setSubjectParent(parentSubject);
+				study.getSubjects().add(studySubject);
 			}
-			return list;
-
+		}
+		return list;
+	} catch (Exception e) {
+		e.printStackTrace();
+		throw new FindException(e.getMessage());
+	} finally {
+		MyConnection.close(rs, preStmt, conn);
+	}
+}
+	
+	/**
+	 * 회원의 이메일로 진행된 (검색 조건에 맞는)스터디의 갯수를 반환한다.
+	 */
+	@Override
+	public int myStudyCount(StudyDTO studyOption, String email) throws FindException {
+		Connection conn = null;
+		PreparedStatement preStmt = null;
+		ResultSet rs = null;
+		String studyStudyCountSQL = null;
+		try {
+			conn = MyConnection.getConnection();
+			studyStudyCountSQL = "SELECT count(*) FROM study "
+								+ "WHERE study_title Like ? "
+								+ "AND user_email Like ? "
+								+ "AND study_size = ? "
+								+ "AND study_diligence_cutline <= ? "
+								+ "AND study_fee <= ? "
+								+ "AND study_start_date >= ? "
+								+ "AND study_end_date <= ? "
+								+ "AND study_id in (select study_id from study_users WHERE user_email = ?)";
+			preStmt = conn.prepareStatement(studyStudyCountSQL);
+			preStmt.setString(1, "%" + studyOption.getStudyTitle()+ "%");
+			preStmt.setString(2, "%" + studyOption.getStudyLeader().getEmail() + "%");
+			preStmt.setInt(3, studyOption.getStudySize());
+			preStmt.setDouble(4, studyOption.getStudyDiligenceCutline());
+			preStmt.setInt(5, studyOption.getStudyFee());
+			preStmt.setDate(6, new java.sql.Date(studyOption.getStudyStartDate().getTime()));
+			preStmt.setDate(7, new java.sql.Date(studyOption.getStudyEndDate().getTime()));
+			preStmt.setString(8, email);
+			rs = preStmt.executeQuery();
+			rs.next();
+			int count = rs.getInt(1);
+			return count;
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new FindException(e.getMessage());
@@ -105,7 +182,7 @@ public class StudyRepositoryOracle implements StudyRepository {
 			MyConnection.close(rs, preStmt, conn);
 		}
 	}
-
+	
 	/**
 	 * 스터디의 현재 정보를 반환한다.
 	 */
@@ -282,7 +359,6 @@ public class StudyRepositoryOracle implements StudyRepository {
 			log.info("insertStudy 끝");
 		}
 	}
-
 	
 	/**
 	 * 과목을 삭제한다.
@@ -437,46 +513,10 @@ public class StudyRepositoryOracle implements StudyRepository {
 	}
 
 	/**
-	 * 검색 조건에 맞는 스터디 개수를 카운트하여 반환한다. (조건 : 타이틀명, 스터디 정원)
+	 * 검색 조건에 맞는 스터디 리스트를 반환한다.
 	 */
 	@Override
-	public int studyCount(String studyTitle, int studySize) throws FindException {
-		Connection conn = null;
-		PreparedStatement preStmt = null;
-		ResultSet rs = null;
-		String studyStudyCountSQL = null;
-		try {
-			conn = MyConnection.getConnection();
-			if (studyTitle == null)
-				studyTitle = "";
-			if (studySize != 0) {
-				studyStudyCountSQL = "SELECT count(*) FROM study WHERE study_title Like ? and study_size = ?";
-				preStmt = conn.prepareStatement(studyStudyCountSQL);
-				preStmt.setString(1, "%" + studyTitle + "%");
-				preStmt.setInt(2, studySize);
-			} else {
-				studyStudyCountSQL = "SELECT count(*) FROM study WHERE study_title Like ? ";
-				preStmt = conn.prepareStatement(studyStudyCountSQL);
-				preStmt.setString(1, "%" + studyTitle + "%");
-			}
-			rs = preStmt.executeQuery();
-			rs.next();
-			int count = rs.getInt(1);
-			return count;
-		} catch (Exception e) {
-			e.printStackTrace();
-			throw new FindException(e.getMessage());
-		} finally {
-			MyConnection.close(rs, preStmt, conn);
-		}
-	}
-
-	/**
-	 * 검색 조건에 맞는 스터디 리스트를 반환한다. (조건 : 현재 페이지, 페이지당 개수, 타이틀명, 스터디 정원)
-	 */
-	@Override
-	public List<StudyDTO> selectStudy(int currentPage, int cntPerPage, String studyTitle, int studySize)
-			throws FindException {
+	public List<StudyDTO> selectStudy(int currentPage, int cntPerPage, StudyDTO studyOption) throws FindException {
 		Connection conn = null;
 		PreparedStatement preStmt = null;
 		ResultSet rs = null;
@@ -486,46 +526,126 @@ public class StudyRepositoryOracle implements StudyRepository {
 		int endRow = currentPage * cntPerPage;
 		try {
 			conn = MyConnection.getConnection();
-			if (studyTitle == null)
-				studyTitle = "";
-			if (studySize != 0) {
-				studyStudySQL = "SELECT * FROM  ( SELECT rownum rn, a.* FROM (SELECT * FROM study WHERE study_title Like ? and study_size = ? order by study_id) a )WHERE rn BETWEEN ? AND ?";
-				preStmt = conn.prepareStatement(studyStudySQL);
-				preStmt.setString(1, "%" + studyTitle + "%");
-				preStmt.setInt(2, studySize);
-				preStmt.setInt(3, startRow);
-				preStmt.setInt(4, endRow);
-			} else {
-				studyStudySQL = "SELECT * FROM  ( SELECT rownum rn, a.* FROM (SELECT * FROM study WHERE study_title Like ? order by study_id) a )WHERE rn BETWEEN ? AND ?";
-				preStmt = conn.prepareStatement(studyStudySQL);
-				preStmt.setString(1, "%" + studyTitle + "%");
-				preStmt.setInt(2, startRow);
-				preStmt.setInt(3, endRow);
-			}
+			studyStudySQL = "SELECT st.*, s.subject_code, s.subject_name, s.subject_parent_code,"
+							+ "(SELECT user_diligence FROM users WHERE user_email = st.user_email) diligence FROM "
+							+ "(SELECT * FROM "
+							+ "(SELECT rownum rn, a.* FROM "
+							+ "(SELECT * FROM study WHERE "
+							+ "study_title Like ? "
+							+ "AND user_email Like ? "
+							+ "AND study_size = ? "
+							+ "AND study.STUDY_DILIGENCE_CUTLINE <= ? "
+							+ "AND study_fee <= ?"
+							+ "AND study_start_date >= ? "
+							+ "AND study_end_date <= ? "
+							+ "order by study_id) a "
+							+ ")WHERE rn BETWEEN ? AND ?) st "
+							+ "JOIN study_subject ss ON st.study_id = ss.study_id "
+							+ "JOIN subject s ON  ss.subject_code = s.subject_code";
+			preStmt = conn.prepareStatement(studyStudySQL);
+			preStmt.setString(1, "%" + studyOption.getStudyTitle()+ "%");
+			preStmt.setString(2, "%" + studyOption.getStudyLeader().getEmail() + "%");
+			preStmt.setInt(3, studyOption.getStudySize());
+			preStmt.setDouble(4, studyOption.getStudyDiligenceCutline());
+			preStmt.setInt(5, studyOption.getStudyFee());
+			preStmt.setDate(6, new java.sql.Date(studyOption.getStudyStartDate().getTime()));
+			preStmt.setDate(7, new java.sql.Date(studyOption.getStudyEndDate().getTime()));
+			preStmt.setInt(8, startRow);
+			preStmt.setInt(9, endRow);
+			
+			int oldRN = 0;
+			int newRN = 0;
+			StudyDTO study = null;
+			StudySubjectDTO studySubject = null;
+			List<StudySubjectDTO> studySubjectList = null;
+			SubjectDTO subject = null;
+			SubjectDTO parentSubject = null;
+			
 			rs = preStmt.executeQuery();
 			while (rs.next()) {
-				int studyId = rs.getInt("study_id");
-				String userEmail = rs.getString("user_email");
-				studyTitle = rs.getString("study_title");
-				studySize = rs.getInt("study_size");
-				int studyFee = rs.getInt("study_fee");
-				int studyCertification = rs.getInt("study_certification");
-				int studyDiligenceCutline = rs.getInt("study_diligence_cutline");
-				Date studyPostDate = rs.getDate("study_post_date");
-				Date studyStartDate = rs.getDate("study_start_date");
-				Date studyEndDate = rs.getDate("study_end_date");
-				int studyHomeworkPerWeek = rs.getInt("STUDY_HOMEWORK_PER_WEEK");
-				int studyPaid = rs.getInt("STUDY_PAID");
-				int studyGatheredSize = rs.getInt("STUDY_GATHERED_SIZE");
-				Clob studyContent = rs.getClob("STUDY_CONTENT");
-
-				StudyDTO studyAll = new StudyDTO(studyId, userEmail, studyTitle, studySize, studyFee,
-						studyCertification, studyDiligenceCutline, studyPostDate, studyStartDate, studyEndDate,
-						studyHomeworkPerWeek, studyPaid, studyGatheredSize, studyContent);
-
-				list.add(studyAll);
+				newRN = rs.getInt("rn");	
+				if(oldRN != newRN) { //같은 스터디를 가르키는지 확인(과목 정보만 바뀐 같은 스터디인가?)
+					study = new StudyDTO();
+					//스터디의 기본정보				
+					study.setStudyId(rs.getInt("study_id"));
+					study.setStudyTitle(rs.getString("study_title"));
+					study.setStudyCertification(rs.getInt("study_certification"));
+					study.setStudySize(rs.getInt("study_size"));
+					study.setStudyFee(rs.getInt("study_fee"));
+					study.setStudyDiligenceCutline(rs.getInt("study_diligence_cutline"));
+					study.setStudyHomeworkPerWeek(rs.getInt("study_homework_per_week"));
+					study.setStudyPostDate(rs.getDate("study_post_date"));
+					study.setStudyStartDate(rs.getDate("study_start_date"));
+					study.setStudyEndDate(rs.getDate("study_end_date"));
+					study.setStudyContent(rs.getClob("study_content"));
+					study.setStudyPaid(rs.getInt("study_paid"));
+					study.setStudyGatheredSize(rs.getInt("study_gathered_size"));
+					//스터디장의 정보
+					UserDTO u = new UserDTO();
+					u.setDiligence(rs.getInt("diligence"));
+					u.setEmail(rs.getString("user_email"));
+					study.setStudyLeader(u);
+					//스터디의 과목정보
+					studySubjectList = new ArrayList<>();
+					studySubject = new StudySubjectDTO(study.getStudyId(), null);
+					subject = new SubjectDTO(rs.getString("subject_code"), rs.getString("subject_name"), null);
+					parentSubject = new SubjectDTO(rs.getString("subject_parent_code"), null, null);
+					subject.setSubjectParent(parentSubject);
+					studySubject.setSubject(subject);
+					studySubjectList.add(studySubject);
+					study.setSubjects(studySubjectList);
+					//리스트에 추가
+					list.add(study);
+					oldRN = newRN;
+				} else {
+					//스터디의 과목정보만 추가
+					studySubject = new StudySubjectDTO(study.getStudyId(), null);
+					subject = new SubjectDTO(rs.getString("subject_code"), rs.getString("subject_name"), null);
+					parentSubject = new SubjectDTO(rs.getString("subject_parent_code"), null, null);
+					subject.setSubjectParent(parentSubject);
+					study.getSubjects().add(studySubject);
+				}
 			}
 			return list;
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new FindException(e.getMessage());
+		} finally {
+			MyConnection.close(rs, preStmt, conn);
+		}
+	}
+
+	/**
+	 * 검색 조건에 맞는 스터디 개수를 카운트하여 반환한다.
+	 */
+	@Override
+	public int studyCount(StudyDTO studyOption) throws FindException {
+		Connection conn = null;
+		PreparedStatement preStmt = null;
+		ResultSet rs = null;
+		String studyStudyCountSQL = null;
+		try {
+			conn = MyConnection.getConnection();
+			studyStudyCountSQL = "SELECT count(*) FROM study "
+								+ "WHERE study_title Like ? "
+								+ "AND user_email Like ? "
+								+ "AND study_size = ? "
+								+ "AND study.STUDY_DILIGENCE_CUTLINE <= ? "
+								+ "AND study_fee <= ? "
+								+ "AND study_start_date >= ? "
+								+ "AND study_end_date <= ? ";
+			preStmt = conn.prepareStatement(studyStudyCountSQL);
+			preStmt.setString(1, "%" + studyOption.getStudyTitle()+ "%");
+			preStmt.setString(2, "%" + studyOption.getStudyLeader().getEmail() + "%");
+			preStmt.setInt(3, studyOption.getStudySize());
+			preStmt.setDouble(4, studyOption.getStudyDiligenceCutline());
+			preStmt.setInt(5, studyOption.getStudyFee());
+			preStmt.setDate(6, new java.sql.Date(studyOption.getStudyStartDate().getTime()));
+			preStmt.setDate(7, new java.sql.Date(studyOption.getStudyEndDate().getTime()));
+			rs = preStmt.executeQuery();
+			rs.next();
+			int count = rs.getInt(1);
+			return count;
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new FindException(e.getMessage());

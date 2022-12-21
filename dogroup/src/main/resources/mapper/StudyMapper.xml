@@ -217,4 +217,46 @@
 		WHERE
 			study_id = #{study_id}
 	</update>
+	
+	<!-- 검색 조건에 맞는 스터디 개수를 카운트하여 반환한다 -->
+	<select id="studyCount" parameterType="StudyDTO" resultType="int" >
+	SELECT 
+		count(*) 
+	FROM 
+		study
+	WHERE 
+		<if test="studyTitle != null">
+			study_title Like '%'||#{studyTitle}||'%' AND
+		</if>
+		<if test="studyLeader != null">
+			user_email Like '%'||#{studyLeader.email}||'%'AND 
+		</if>
+		<if test="studySize != 0">
+			study_size = #{studySize} AND 
+		</if>
+		<if test="studyDiligenceCutline != 0">
+		 	<![CDATA[
+		 		study_diligence_cutline <= #{studyDiligenceCutline} AND
+			 ]]>
+		</if>
+		<if test="studyFee != 0">
+		 	<![CDATA[
+		 		study_fee <= #{studyFee} AND 
+		 	]]>
+		</if>
+		<if test="studyStartDate != null">
+			<![CDATA[
+		 		study_start_date >= #{studyStartDate} AND
+		 	]]>
+		</if>
+		<if test="studyEndDate != null">
+			<![CDATA[
+		 		study_end_date <= #{studyEndDate} AND
+		 	]]>
+		</if>
+			<![CDATA[
+				NOT study_size < 0 
+			]]>
+	</select>
+	
 </mapper>

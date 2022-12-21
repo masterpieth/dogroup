@@ -51,7 +51,7 @@
 		</collection>
 	</resultMap>
 	
-	<resultMap  id="studyUsersResultMap" type="StudyUserDTO">
+	<resultMap  id="studyUsersResultMap" 			type="StudyUserDTO">
 	<id property="studyId" 							column="study_id"/>
 	<id property="email" 							column="user_email"/>
 		<result property="name" 					column="user_name"/>
@@ -62,11 +62,19 @@
 			<id property="studyId" 					column="study_id"/>
 			<id property="studySubmitDt"			column="study_submit_dt"/>
 			<id property="email" 					column="user_email"/>
-			<result property="email" 					column="user_email"/>
-			
+			<result property="email" 				column="user_email"/>
 		</collection>
 	</resultMap>
-
+	
+	<resultMap id="subjectMap" 					type="SubjectDTO">
+		<id 	property="subjectCode" 			column="subject_code"/>
+		<result property="subjectName" 			column="subject_name"/>
+		<!--부모과목-->
+		<association property="subjectParent" 	javaType="SubjectDTO">
+			<result property="subjectCode" 		column="subject_parent_code"/>
+		</association>
+	</resultMap>
+	
 	<!--회원에게 스터디 종료에 따른 금액을 환급한다.-->
 	<update id="refundToUser" statementType="CALLABLE" parameterType="hashmap">
 		{ CALL proc_wallet_prize (
@@ -458,5 +466,13 @@
 			(select study_id FROM study_users WHERE user_email = #{email}) USING(study_id)
 		WHERE
 			study_certification = 1
+	</select>
+	
+	<!--과목들을 가져온다-->
+	<select id="selectSubject" resultMap="subjectMap">
+		SELECT
+			*
+		FROM
+			subject
 	</select>
 </mapper>

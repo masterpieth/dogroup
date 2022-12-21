@@ -19,6 +19,7 @@ import com.dogroup.dto.HomeworkDTO;
 import com.dogroup.dto.PageBean;
 import com.dogroup.dto.StudyDTO;
 import com.dogroup.dto.StudyUserDTO;
+import com.dogroup.dto.SubjectDTO;
 import com.dogroup.dto.UserDTO;
 import com.dogroup.exception.AddException;
 import com.dogroup.exception.FindException;
@@ -563,5 +564,14 @@ public class StudyService {
 	 */
 	public void deleteStudy(int studyId) throws RemoveException {
 		repository.deleteStudy(studyId);
+	}
+	
+	/**
+	 * 과목들을 가져온다.
+	 * @return	과목리스트
+	 * @throws FindException 
+	 */
+	public List<SubjectDTO> getSubjectList() throws FindException {
+		return repository.selectSubject();
 	}
 }

@@ -16,12 +16,14 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.dogroup.dto.UserDTO;
 import com.dogroup.exception.AddException;
+import com.dogroup.exception.FindException;
 import com.dogroup.exception.ModifyException;
 import com.dogroup.service.UserService;
 import com.dogroup.util.GithubLoginUtil;
@@ -83,7 +85,7 @@ public class UserController {
 	 * @throws Exception
 	 */
 	@GetMapping("auth/github/callback")
-	public String githubAuthCallback(String code, HttpSession session, HttpServletResponse response) throws Exception {
+	public String githubAuthCallback(String code, HttpSession session) throws Exception {
 		log.info("github auth callback 시작 - 1회용 code: " + code);
 		
 		String accessToken = GithubLoginUtil.getAccessToken(code);
@@ -93,8 +95,13 @@ public class UserController {
 		if(userService.idDuplicateCheck(email)) {
 			redirectURL = frontURL + "user_signup.html?email=" + email;
 		} else {
-			session.setAttribute("loginedId", email);
-			redirectURL = frontURL + "index.html?email=" + email;
+			UserDTO user = userService.searchUserInfo(email);
+			if(user.getStatus() == 0) {
+				redirectURL = frontURL + "index.html?status=0";
+			} else {
+				session.setAttribute("loginedId", email);
+				redirectURL = frontURL + "index.html?email=" + email;
+			}
 		}
 		log.info("github auth callback 끝 redirectURL: " + redirectURL);
 		return "redirect:" + redirectURL;
@@ -130,8 +137,43 @@ public class UserController {
 		
 		String email = (String) session.getAttribute("loginedId");
 		userService.withdraw(email);
+		session.invalidate();
 		
 		log.info("withdraw 끝");
 		return new ResponseEntity<>(HttpStatus.OK);
+	}
+	
+	/**
+	 * 사용자 정보를 반환한다.
+	 * @return
+	 * @throws FindException 
+	 */
+	@GetMapping
+	@ResponseBody
+	public ResponseEntity<?> userInfo(HttpSession session) throws FindException {
+		log.info("userInfo 시작");
+		
+		String email = (String)session.getAttribute("loginedId");
+		UserDTO user = userService.searchUserInfo(email);
+		
+		log.info("userInfo 끝");
+		return new ResponseEntity<>(user, HttpStatus.OK);
+	}
+	
+	/**
+	 * 사용자 정보를 수정한다.
+	 * @param user
+	 * @return
+	 * @throws ModifyException
+	 */
+	@PutMapping
+	@ResponseBody
+	public ResponseEntity<?> updateUser(@RequestBody UserDTO user) throws ModifyException {
+		log.info("updateUser(컨트롤러) 시작");
+		
+		userService.modifyUser(user);
+		
+		log.info("updateUser(컨트롤러) 끝");
+		return new ResponseEntity<>(user, HttpStatus.OK);
 	}
 }

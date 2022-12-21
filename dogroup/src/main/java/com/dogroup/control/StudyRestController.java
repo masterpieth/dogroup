@@ -1,5 +1,7 @@
 package com.dogroup.control;
 
+import java.util.List;
+
 import javax.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.dogroup.dto.PageBean;
 import com.dogroup.dto.StudyDTO;
 import com.dogroup.dto.StudyUserDTO;
+import com.dogroup.dto.SubjectDTO;
 import com.dogroup.exception.AddException;
 import com.dogroup.exception.FindException;
 import com.dogroup.exception.ModifyException;
@@ -229,5 +232,19 @@ public class StudyRestController {
 		
 		log.info("searchMyStudy(컨트롤러) 끝");
 		return new ResponseEntity<>(studyList, HttpStatus.OK);
+	}
+	/**
+	 * 과목 정보들을 가져온다.
+	 * @return
+	 * @throws FindException
+	 */
+	@GetMapping("subject/list")
+	public ResponseEntity<?> subjectList() throws FindException {
+		log.info("subjectList(컨트롤러) 시작");
+		
+		List<SubjectDTO> list = studyService.getSubjectList();
+		
+		log.info("subjectList(컨트롤러) 끝");
+		return new ResponseEntity<>(list, HttpStatus.OK);
 	}
 }

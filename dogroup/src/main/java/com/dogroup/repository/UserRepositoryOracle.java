@@ -98,4 +98,27 @@ public class UserRepositoryOracle implements UserRepository {
 			log.info("updateUserStatus 끝");
 		}
 	}
+
+	/**
+	 * 회원 정보를 업데이트 한다(비밀번호 또는 이름)
+	 * @param userDTO
+	 * @throws ModifyException
+	 */
+	@Override
+	public void updateUser(UserDTO userDTO) throws ModifyException {
+		log.info("updateUser 시작");
+		SqlSession session = null;
+		try {
+			session = sqlSessionFactory.openSession();
+			session.update("com.dogroup.mybatis.UserMapper.updateUser", userDTO);
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new ModifyException(e.getMessage());
+		} finally {
+			if(session != null) {
+				session.close();
+			}
+			log.info("updateUser 끝");
+		}
+	}
 }

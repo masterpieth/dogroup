@@ -8,6 +8,7 @@ import org.apache.ibatis.session.SqlSession;
 import com.dogroup.dto.HomeworkDTO;
 import com.dogroup.dto.StudyDTO;
 import com.dogroup.dto.StudyUserDTO;
+import com.dogroup.dto.SubjectDTO;
 import com.dogroup.exception.AddException;
 import com.dogroup.exception.FindException;
 import com.dogroup.exception.ModifyException;
@@ -184,4 +185,11 @@ public interface StudyRepository {
 	 * @throws FindException 스터디가 존재하면 FindException을 터뜨린다.
 	 */
 	void selectCurrentlyStudyByEmail(String email) throws FindException;
+	
+	/**
+	 * 과목들을 모두 가져온다.
+	 * @return
+	 * @throws FindException
+	 */
+	List<SubjectDTO> selectSubject() throws FindException;
 }

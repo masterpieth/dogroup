@@ -18,6 +18,7 @@ import com.dogroup.dto.HomeworkDTO;
 import com.dogroup.dto.StudyDTO;
 import com.dogroup.dto.StudySubjectDTO;
 import com.dogroup.dto.StudyUserDTO;
+import com.dogroup.dto.SubjectDTO;
 import com.dogroup.exception.AddException;
 import com.dogroup.exception.FindException;
 import com.dogroup.exception.ModifyException;
@@ -593,6 +594,29 @@ public class StudyRepositoryOracle implements StudyRepository {
 				session.close();
 			}
 			log.info("selectCurrentlyStudyByEmail 끝");
+		}
+	}
+
+	/**
+	 * 과목들을 모두 가져온다.
+	 * @return
+	 * @throws FindException
+	 */
+	@Override
+	public List<SubjectDTO> selectSubject() throws FindException {
+		log.info("selectSubject 시작");
+		SqlSession session = null;
+		try {
+			session = sqlSessionFactory.openSession();
+			return session.selectList("com.dogroup.mybatis.StudyMapper.selectSubject");
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new FindException(e.getMessage());
+		} finally {
+			if(session != null) {
+				session.close();
+			}
+			log.info("selectSubject 끝");
 		}
 	}
 }

@@ -14,7 +14,12 @@
 	<!--사용자 정보 가져오기-->
 	<select id="selectUserByEmail" parameterType="String" resultMap="userMap">
 		SELECT
-			*
+			user_email,
+			user_name,
+			user_password,
+			user_diligence,
+			user_balance,
+			user_status
 		FROM users
 		WHERE
 			user_email = #{userEmail}
@@ -42,6 +47,20 @@
 		UPDATE users
 		SET
 			user_status = 0
+		WHERE
+			user_email = #{email}
+	</update>
+	<!--회원정보 업데이트-->
+	<update id="updateUser" parameterType="UserDTO">
+		UPDATE users
+		<set>
+			<if test="password != null">
+				user_password = #{password},
+			</if>
+			<if test="name != null">
+				user_name = #{name},
+			</if>
+		</set>
 		WHERE
 			user_email = #{email}
 	</update>

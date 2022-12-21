@@ -32,4 +32,11 @@ public interface UserRepository {
 	 * @throws ModifyException
 	 */
 	void updateUserStatus(String email) throws ModifyException;
+	
+	/**
+	 * 회원 정보를 업데이트 한다(비밀번호 또는 이름)
+	 * @param userDTO
+	 * @throws ModifyException
+	 */
+	void updateUser(UserDTO userDTO) throws ModifyException;
 }

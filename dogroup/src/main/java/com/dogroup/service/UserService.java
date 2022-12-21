@@ -65,4 +65,13 @@ public class UserService {
 	public void withdraw(String email) throws ModifyException {
 		repository.updateUserStatus(email);
 	}
+	
+	/**
+	 * 사용자 정보를 수정한다.
+	 * @param user
+	 * @throws ModifyException
+	 */
+	public void modifyUser(UserDTO user) throws ModifyException {
+		repository.updateUser(user);
+	}
 }

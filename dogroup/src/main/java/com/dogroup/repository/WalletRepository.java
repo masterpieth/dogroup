@@ -1,6 +1,7 @@
 package com.dogroup.repository;
 
 import java.util.List;
+import java.util.Map;
 
 import com.dogroup.dto.WalletDTO;
 import com.dogroup.exception.FindException;
@@ -13,7 +14,7 @@ public interface WalletRepository {
 	 * @return 지갑 내역
 	 * @throws FindException
 	 */
-	List<WalletDTO> selectWallet(String email) throws FindException;
+	List<WalletDTO> selectWallet(int currentPage, int cntPerPage, String email) throws FindException;
 
 	/**
 	 * 

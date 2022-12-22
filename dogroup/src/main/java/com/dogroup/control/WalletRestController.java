@@ -80,7 +80,7 @@ public class WalletRestController {
 		log.info("walletList 시작: currentPage: " + currentPage);
 		
 		String email = (String) session.getAttribute("loginedId");
-		List<WalletDTO> walletList = walletService.searchTransactionListAll(email);
+		List<WalletDTO> walletList = walletService.searchTransactionListAll(currentPage, PageBean.CNT_PER_PAGE, email);
 		PageBean<WalletDTO> pb = new PageBean<>(currentPage, walletList, walletService.getWalletTotalCnt(email));
 		
 		log.info("walletList 끝");

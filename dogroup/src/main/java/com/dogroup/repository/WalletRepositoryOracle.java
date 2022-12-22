@@ -32,13 +32,19 @@ public class WalletRepositoryOracle implements WalletRepository {
 	 * @throws FindException
 	 */
 	@Override
-	public List<WalletDTO> selectWallet(String email) throws FindException {
-		log.info("selectWallet 시작 email: " + email);
+	public List<WalletDTO> selectWallet(int currentPage, int cntPerPage, String email) throws FindException {
+		log.info("selectWallet 시작");
+		int startRow = currentPage * cntPerPage - cntPerPage + 1;
+		int endRow = currentPage * cntPerPage;
 		List<WalletDTO> list = null;
 		SqlSession session = null;
+		Map<String, Object> map = new HashMap<>();
+		map.put("startRow", startRow);
+		map.put("endRow", endRow);
+		map.put("email", email);
 		try {
 			session = sqlSessionFactory.openSession();
-			list = session.selectList("com.dogroup.mybatis.WalletMapper.selectWallet", email);
+			list = session.selectList("com.dogroup.mybatis.WalletMapper.selectWallet", map);
 			if(list == null) {
 				return new ArrayList<>();
 			}

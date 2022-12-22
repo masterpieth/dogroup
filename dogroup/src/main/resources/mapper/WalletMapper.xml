@@ -17,24 +17,25 @@
 		</association>
 	</resultMap>
 	
-	<select id="selectWallet" parameterType="String" resultMap="walletResultMap">
+	<select id="selectWallet" parameterType="hashmap" resultMap="walletResultMap">
 		SELECT
+			a.* from  (SELECT rownum rn,
 			w.transaction_no,
 			w.user_email,
 			w.wallet_balance,
 			w.transaction_date,
-			s.study_id,
-			s.study_title,
+			w.study_id,
+            s.study_title,
 			w.transaction_user,
 			w.transaction_category,
 			w.transaction_money
 		FROM
 			wallet w
-		LEFT JOIN study s ON s.study_id = w.study_id
+        LEFT JOIN study s ON s.study_id = w.study_id
 		WHERE
 			w.user_email = #{email}
-		ORDER BY
-			w.transaction_no DESC
+        ORDER BY w.transaction_no DESC) a
+        where rn between #{startRow} and #{endRow} 
 	</select>
 	
 	<update id="updateUserBalance" statementType="CALLABLE" parameterType="hashmap">

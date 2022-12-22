@@ -4,6 +4,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import org.slf4j.Logger;
@@ -34,8 +35,8 @@ public class WalletService {
 	 * @return 					지갑목록
 	 * @throws FindException
 	 */
-	public List<WalletDTO> searchTransactionListAll(String email) throws FindException {
-		return repository.selectWallet(email);
+	public List<WalletDTO> searchTransactionListAll(int currentPage, int cntPerPage, String email) throws FindException {
+		return repository.selectWallet(currentPage, cntPerPage, email);
 	}
 
 	/**

@@ -17,7 +17,7 @@ public class MyServletContext implements WebMvcConfigurer {
 
 	@Override
 	public void addCorsMappings(CorsRegistry registry) {
-		registry.addMapping("/**").allowCredentials(true).allowedOrigins("http://192.168.2.46:5500").allowedMethods("GET", "POST", "PUT", "DELETE");
+		registry.addMapping("/**").allowCredentials(true).allowedOrigins("http://127.0.0.1:5500").allowedMethods("GET", "POST", "PUT", "DELETE");
 	}
 	
 	@Bean

@@ -459,8 +459,6 @@ public class StudyRepositoryOracle implements StudyRepository {
 			session = sqlSessionFactory.openSession();
 
 			int count = session.selectOne("com.dogroup.mybatis.StudyMapper.studyCount", studyDTO);
-
-			int count = session.selectOne("studyCount", studyDTO);
 			return count;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -594,9 +592,9 @@ public class StudyRepositoryOracle implements StudyRepository {
 			session = sqlSessionFactory.openSession();
 
 			int num = session.selectOne("com.dogroup.mybatis.StudyMapper.selectCurrentlyStudyByEmail", email);
-			if(num != 0) {
+			
 
-			int num = session.selectOne("selectCurrentlyStudyByEmail", email);
+			num = session.selectOne("selectCurrentlyStudyByEmail", email);
 			if (num != 0) {
 
 				throw new FindException("현재 이미 깃방식의 참여중인 스터디가 있습니다.");

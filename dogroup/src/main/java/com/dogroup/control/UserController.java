@@ -27,6 +27,7 @@ import com.dogroup.exception.FindException;
 import com.dogroup.exception.ModifyException;
 import com.dogroup.service.UserService;
 import com.dogroup.util.GithubLoginUtil;
+import com.dogroup.util.KakaoLoginUtil;
 
 /**
  * User관련 컨트롤러
@@ -175,5 +176,53 @@ public class UserController {
 		
 		log.info("updateUser(컨트롤러) 끝");
 		return new ResponseEntity<>(user, HttpStatus.OK);
+	}
+	
+	/**
+	 * kakao 로그인 페이지로 보낸다. kakao에 로그인이 되어있는 경우에는 바로 kakaoAuthCallback으로 이동된다.
+	 * @return	kakao 로그인 페이지
+	 * @throws Exception
+	 */
+	@GetMapping("loginkakao")
+	public ResponseEntity<?> loginkakao() throws Exception {
+		log.info("login 시작");
+		
+		String clientId = KakaoLoginUtil.getApiClientId();
+		Map<String, Object> map = new HashMap<>();
+		map.put("authorize_url", KakaoLoginUtil.AUTHORIZE_URL);
+		map.put("redirect_url", KakaoLoginUtil.REDIRECT_URL);
+		map.put("client_id", clientId);
+		
+		log.info("login 끝");
+		return new ResponseEntity<>(map, HttpStatus.OK);
+	}
+	/**
+	 * 인증 후 사용자의 email을 받아온다.
+	 * @param code				kakao api에서 발급받은 1회용 인증 코드
+	 * @param session			HttpSession
+	 * @return					아이디가 없으면 회원가입 페이지로, 없으면 index 페이지로 redirect됨
+	 * @throws Exception
+	 */
+	@GetMapping("auth/kakao/callback")
+	public String kakaoAuthCallback(String code, HttpSession session) throws Exception {
+		log.info("kakao auth callback 시작 - 1회용 code: " + code);
+		
+		String accessToken = KakaoLoginUtil.getAccessToken(code);
+		String email = KakaoLoginUtil.getUserEmail(accessToken);
+		
+		String redirectURL = "";
+		if(userService.idDuplicateCheck(email)) {
+			redirectURL = frontURL + "user_signup.html?email=" + email;
+		} else {
+			UserDTO user = userService.searchUserInfo(email);
+			if(user.getStatus() == 0) {
+				redirectURL = frontURL + "index.html?status=0";
+			} else {
+				session.setAttribute("loginedId", email);
+				redirectURL = frontURL + "index.html?email=" + email;
+			}
+		}
+		log.info("kakao auth callback 끝 redirectURL: " + redirectURL);
+		return "redirect:" + redirectURL;
 	}
 }

@@ -3,6 +3,8 @@ package com.dogroup.dto;
 import java.util.Date;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 /**
  * 스터디 관련 DTO
  * @author Chanmin, Bomi
@@ -15,8 +17,11 @@ public class StudyDTO {
 	private int studyFee;					//스터디 입장료
 	private int studyCertification;			//스터디 인증방식
 	private double studyDiligenceCutline;	//스터디 성실도 기준
+	@JsonFormat(shape= JsonFormat.Shape.STRING, pattern="yyyy-MM-dd", timezone="Asia/Seoul")
 	private Date studyPostDate;				//스터디 게시일자
+	@JsonFormat(shape= JsonFormat.Shape.STRING, pattern="yyyy-MM-dd", timezone="Asia/Seoul")
 	private Date studyStartDate;			//스터디 시작일자
+	@JsonFormat(shape= JsonFormat.Shape.STRING, pattern="yyyy-MM-dd", timezone="Asia/Seoul")
 	private Date studyEndDate;				//스터디 종료일자
 	private int studyHomeworkPerWeek;		//스터디 주당 과제 횟수(1~7)
 	private int studyPaid;					//스터디 정산여부(최종 정산)

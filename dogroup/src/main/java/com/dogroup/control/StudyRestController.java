@@ -205,7 +205,7 @@ public class StudyRestController {
 	 * @return
 	 * @throws FindException
 	 */
-	@GetMapping("list/{currentPage}")
+	@PostMapping("list/{currentPage}")
 	public ResponseEntity<?> searchStudy(@PathVariable int currentPage, @RequestBody StudyDTO studyOption) throws FindException {
 		log.info("searchStudy(컨트롤러) 시작: currentPage: " + currentPage);
 		

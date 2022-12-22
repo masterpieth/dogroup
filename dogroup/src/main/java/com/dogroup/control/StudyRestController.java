@@ -158,11 +158,12 @@ public class StudyRestController {
 	 * @return
 	 * @throws FindException 
 	 */
-	@GetMapping("users/{studyId}")
-	public ResponseEntity<?> searchStudyUserInfo(@PathVariable int studyId, String email) throws FindException {
-		log.info("searchStudyUserInfo(컨트롤러) 시작: studyId: " + studyId + " /email: " + email);
+	@PostMapping("users/{studyId}")
+	public ResponseEntity<?> searchStudyUserInfo(@PathVariable int studyId, @RequestBody Map<String, String> map) throws FindException {
 		
-		StudyUserDTO studyUser = studyService.searchMyStudyUserInfo(email, studyId);
+		log.info("searchStudyUserInfo(컨트롤러) 시작: studyId: " + studyId + " /email: " + map.get("email"));
+		
+		StudyUserDTO studyUser = studyService.searchMyStudyUserInfo(map.get("email"), studyId);
 		
 		log.info("searchStudyUserInfo(컨트롤러) 끝");
 		return new ResponseEntity<>(studyUser, HttpStatus.OK);

@@ -304,4 +304,11 @@ class StudyRepositoryTest {
 		String email = "user1@gmail.com";
 		studyRepository.selectCurrentlyStudyByEmail(email);
 	}
+	
+	@Test
+	int 스터디장이지금까지참여했던스터디개수() throws FindException{
+		String email= "user3@gmail.com";
+		studyRepository.selectStudyLeaderFinishStudy(email);
+		return 2;
+	}
 }

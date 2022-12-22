@@ -479,4 +479,38 @@
 		FROM
 			subject
 	</select>
+	
+	<select id="selectStudyLeaderFinishStudy" parameterType="String" resultType="int">
+		SELECT 
+		COUNT(*) 
+		FROM
+			(SELECT 
+				su.study_id,
+				su.user_email,
+				s.study_end_date 
+			FROM 
+				study_users su
+	        JOIN 
+	        	study s 
+	        ON
+	   			 s.study_id = su.study_id
+	        WHERE su.user_email = #{email} AND 
+	       <![CDATA[
+			 	 s.study_end_date < sysdate)
+			 	 ]]>
+      
+	</select>
 </mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+

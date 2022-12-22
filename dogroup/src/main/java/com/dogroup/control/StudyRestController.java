@@ -32,6 +32,7 @@ import com.dogroup.service.StudyService;
 
 /**
  * 스터디 관련 REST 컨트롤러
+ * 
  * @author NYK
  *
  */
@@ -40,14 +41,15 @@ import com.dogroup.service.StudyService;
 public class StudyRestController {
 
 	private Logger log = LoggerFactory.getLogger(getClass());
-	
+
 	@Autowired
 	private StudyService studyService;
-	
+
 	/**
 	 * 스터디 상세 조회한다.
+	 * 
 	 * @param studyId
-	 * @return	StudyDTO
+	 * @return StudyDTO
 	 * @throws FindException
 	 */
 	@GetMapping("{studyId}")
@@ -55,36 +57,41 @@ public class StudyRestController {
 		log.info("searchStudyInfo(컨트롤러) 시작: studyId: " + studyId);
 		StudyDTO study = studyService.searchStudyInfo(studyId);
 		List<SubjectDTO> subjects = studyService.getSubjectList();
-		
+		int studyLeaderFinishStudy = studyService.searchStudyLeaderFinishStudy(study.getStudyLeader().getEmail());
+
 		Map<String, Object> map = new HashMap<>();
 		map.put("study", study);
 		map.put("subjects", subjects);
-		
+		map.put("studyLeaderFinishStudy", studyLeaderFinishStudy);
+
 		log.info("searchStudyInfo(컨트롤러) 끝");
 		return new ResponseEntity<>(map, HttpStatus.OK);
 	}
-	
+
 	/**
 	 * 스터디에 가입한다.
+	 * 
 	 * @param studyId
 	 * @param study
 	 * @param session
 	 * @return
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	@PostMapping("join/{studyId}")
-	public ResponseEntity<?> joinStudy(@PathVariable int studyId, StudyDTO study, HttpSession session) throws Exception {
+	public ResponseEntity<?> joinStudy(@PathVariable int studyId, StudyDTO study, HttpSession session)
+			throws Exception {
 		log.info("joinStudy(컨트롤러) 시작: studyId: " + studyId);
-		
+
 		String email = (String) session.getAttribute("loginedId");
 		studyService.joinStudy(email, study);
-		
+
 		log.info("joinStudy(컨트롤러) 끝");
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
-	
+
 	/**
 	 * 스터디 참여를 취소한다.
+	 * 
 	 * @param studyId
 	 * @param study
 	 * @param session
@@ -92,51 +99,56 @@ public class StudyRestController {
 	 * @throws RemoveException
 	 */
 	@DeleteMapping("join/{studyId}")
-	public ResponseEntity<?> leaveStudy(@PathVariable int studyId, StudyDTO study, HttpSession session) throws RemoveException {
+	public ResponseEntity<?> leaveStudy(@PathVariable int studyId, StudyDTO study, HttpSession session)
+			throws RemoveException {
 		log.info("leaveStudy(컨트롤러) 시작: studyId: " + studyId);
-		
+
 		String email = (String) session.getAttribute("loginedId");
 		studyService.leaveStudy(study, email);
-		
+
 		log.info("leaveStudy(컨트롤러) 끝");
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
-	
+
 	/**
 	 * 스터디를 개설한다.
+	 * 
 	 * @param study
 	 * @return
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	@PostMapping(produces = "application/json;charset=utf-8")
 	public ResponseEntity<?> openStudy(@RequestBody StudyDTO study) throws Exception {
 		log.info("openStudy(컨트롤러) 시작");
-		
+
 		studyService.openStudy(study);
-		
+
 		log.info("openStudy(컨트롤러) 끝");
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
-	
+
 	/**
 	 * 스터디 내용을 수정한다.
+	 * 
 	 * @param studyId
 	 * @param study
 	 * @return
 	 * @throws ModifyException
 	 */
 	@PutMapping("{studyId}")
-	public ResponseEntity<?> modifyStudy(@PathVariable int studyId, @RequestBody StudyDTO study) throws ModifyException {
+	public ResponseEntity<?> modifyStudy(@PathVariable int studyId, @RequestBody StudyDTO study)
+			throws ModifyException {
 		log.info("modifyStudy(컨트롤러) 시작");
-		
+
 		studyService.modifyStudy(study);
-		
+
 		log.info("modifyStudy(컨트롤러) 끝");
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
-	
+
 	/**
 	 * 스터디를 삭제한다.
+	 * 
 	 * @param studyId
 	 * @return
 	 * @throws RemoveException
@@ -144,20 +156,22 @@ public class StudyRestController {
 	@DeleteMapping("{studyId}")
 	public ResponseEntity<?> deleteStudy(@PathVariable int studyId) throws RemoveException {
 		log.info("deleteStudy(컨트롤러) 시작");
-		
+
 		studyService.deleteStudy(studyId);
-		
+
 		log.info("deleteStudy(컨트롤러) 끝");
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
-	
+
 	/**
 	 * 스터디원의 상세 정보를 조회한다.
+	 * 
 	 * @param studyId
 	 * @param email
 	 * @return
-	 * @throws FindException 
+	 * @throws FindException
 	 */
+
 	@PostMapping("users/{studyId}")
 	public ResponseEntity<?> searchStudyUserInfo(@PathVariable int studyId, @RequestBody Map<String, String> map) throws FindException {
 		
@@ -165,12 +179,21 @@ public class StudyRestController {
 		
 		StudyUserDTO studyUser = studyService.searchMyStudyUserInfo(map.get("email"), studyId);
 		
+
+	@GetMapping("users/{studyId}")
+	public ResponseEntity<?> searchStudyUserInfo(@PathVariable int studyId, String email) throws FindException {
+		log.info("searchStudyUserInfo(컨트롤러) 시작: studyId: " + studyId + " /email: " + email);
+
+		StudyUserDTO studyUser = studyService.searchMyStudyUserInfo(email, studyId);
+
+
 		log.info("searchStudyUserInfo(컨트롤러) 끝");
 		return new ResponseEntity<>(studyUser, HttpStatus.OK);
 	}
-	
+
 	/**
 	 * 출석형 과제를 제출한다.
+	 * 
 	 * @param studyId
 	 * @param session
 	 * @return
@@ -179,16 +202,17 @@ public class StudyRestController {
 	@PostMapping("homework/{studyId}")
 	public ResponseEntity<?> homework(@PathVariable int studyId, HttpSession session) throws AddException {
 		log.info("homework(컨트롤러) 시작: studyId: " + studyId);
-		
+
 		String email = (String) session.getAttribute("loginedId");
 		studyService.checkTodayHomework(email, studyId);
-		
+
 		log.info("homework(컨트롤러) 끝");
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
-	
+
 	/**
 	 * Github형 과제를 제출한다.
+	 * 
 	 * @param studyId
 	 * @param session
 	 * @return
@@ -197,33 +221,36 @@ public class StudyRestController {
 	@PostMapping("githomework/{studyId}")
 	public ResponseEntity<?> gitHomework(@PathVariable int studyId, HttpSession session) throws AddException {
 		log.info("githomework(컨트롤러) 시작: studyId: " + studyId);
-		
+
 		String email = (String) session.getAttribute("loginedId");
 		studyService.checkMyGithubCommit(email, studyId);
-		
+
 		log.info("githomework(컨트롤러) 끝");
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
 	/**
 	 * 스터디 목록을 조회한다.
+	 * 
 	 * @param currentPage
 	 * @param studyOption
 	 * @return
 	 * @throws FindException
 	 */
 	@PostMapping("list/{currentPage}")
-	public ResponseEntity<?> searchStudy(@PathVariable int currentPage, @RequestBody StudyDTO studyOption) throws FindException {
+	public ResponseEntity<?> searchStudy(@PathVariable int currentPage, @RequestBody StudyDTO studyOption)
+			throws FindException {
 		log.info("searchStudy(컨트롤러) 시작: currentPage: " + currentPage);
-		
+
 		PageBean<StudyDTO> studyList = studyService.getPageBeanAll(currentPage, studyOption);
-		
+
 		log.info("searchStudy(컨트롤러) 끝");
 		return new ResponseEntity<>(studyList, HttpStatus.OK);
 	}
-	
+
 	/**
 	 * 진행중인 스터디를 검색한다.
+	 * 
 	 * @param currentPage
 	 * @param studyOption
 	 * @param session
@@ -231,26 +258,29 @@ public class StudyRestController {
 	 * @throws FindException
 	 */
 	@GetMapping("my/list/{currentPage}")
-	public ResponseEntity<?> searchMyStudy(@PathVariable int currentPage, @RequestBody StudyDTO studyOption, HttpSession session) throws FindException {
+	public ResponseEntity<?> searchMyStudy(@PathVariable int currentPage, @RequestBody StudyDTO studyOption,
+			HttpSession session) throws FindException {
 		log.info("searchMyStudy(컨트롤러) 시작: currentPage: " + currentPage);
-		
+
 		String email = (String) session.getAttribute("loginedId");
 		PageBean<StudyDTO> studyList = studyService.getPageBeanMy(currentPage, studyOption, email);
-		
+
 		log.info("searchMyStudy(컨트롤러) 끝");
 		return new ResponseEntity<>(studyList, HttpStatus.OK);
 	}
+
 	/**
 	 * 과목 정보들을 가져온다.
+	 * 
 	 * @return
 	 * @throws FindException
 	 */
 	@GetMapping("subject/list")
 	public ResponseEntity<?> subjectList() throws FindException {
 		log.info("subjectList(컨트롤러) 시작");
-		
+
 		List<SubjectDTO> list = studyService.getSubjectList();
-		
+
 		log.info("subjectList(컨트롤러) 끝");
 		return new ResponseEntity<>(list, HttpStatus.OK);
 	}

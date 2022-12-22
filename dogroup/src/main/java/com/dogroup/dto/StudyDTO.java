@@ -30,6 +30,7 @@ public class StudyDTO {
 	
 	private List<StudySubjectDTO> subjects;	//스터디 과목 리스트(최대 3과목)
 	private UserDTO studyLeader; 			//스터티장 정보
+	private int studyLeaderFinishStudy;		//스터디장이 참여완료한 스터디 수
 	private List<StudyUserDTO> studyUsers; 	//스터디원 정보
 	
 	public StudyDTO() {
@@ -192,6 +193,14 @@ public class StudyDTO {
 
 	public void setStudyUsers(List<StudyUserDTO> studyUsers) {
 		this.studyUsers = studyUsers;
+	}
+
+	public int getStudyLeaderFinishStudy() {
+		return studyLeaderFinishStudy;
+	}
+
+	public void setStudyLeaderFinishStudy(int studyLeaderFinishStudy) {
+		this.studyLeaderFinishStudy = studyLeaderFinishStudy;
 	}
 	
 }

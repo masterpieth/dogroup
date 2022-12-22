@@ -36,7 +36,8 @@ public class StudyRepositoryOracle implements StudyRepository {
 	 * 회원의 이메일로 진행된 (검색 조건에 맞는)스터디 정보를 반환한다.
 	 */
 	@Override
-	public List<StudyDTO> selectStudyByEmail(int currentPage, int cntPerPage, StudyDTO studyOption, String email) throws FindException {
+	public List<StudyDTO> selectStudyByEmail(int currentPage, int cntPerPage, StudyDTO studyOption, String email)
+			throws FindException {
 		int startRow = currentPage * cntPerPage - cntPerPage + 1;
 		int endRow = currentPage * cntPerPage;
 		log.info("myStudyCount 시작 userEmail: " + email + " / studyOption:" + studyOption.getStudyTitle());
@@ -60,7 +61,7 @@ public class StudyRepositoryOracle implements StudyRepository {
 			log.info("myStudyCount 끝");
 		}
 	}
-	
+
 	/**
 	 * 회원의 이메일로 진행된 (검색 조건에 맞는)스터디의 갯수를 반환한다.
 	 */
@@ -87,7 +88,7 @@ public class StudyRepositoryOracle implements StudyRepository {
 		}
 
 	}
-	
+
 	/**
 	 * 스터디의 현재 정보를 반환한다.
 	 */
@@ -99,7 +100,7 @@ public class StudyRepositoryOracle implements StudyRepository {
 		try {
 			session = sqlSessionFactory.openSession();
 			study = session.selectOne("com.dogroup.mybatis.StudyMapper.selectStudyByStudyId", studyId);
-			if(study == null) {
+			if (study == null) {
 				throw new FindException("정보 조회에 실패했습니다.");
 			}
 			return study;
@@ -108,7 +109,7 @@ public class StudyRepositoryOracle implements StudyRepository {
 			e.printStackTrace();
 			throw new FindException(e.getMessage());
 		} finally {
-			if(session != null) {
+			if (session != null) {
 				session.close();
 			}
 			log.info("selectStudyByStudyId 끝");
@@ -201,51 +202,52 @@ public class StudyRepositoryOracle implements StudyRepository {
 		}
 	}
 
-    /**
-     * 스터디회원의 과제를 insert한다
-     * @author kangb
-     * MyBatis로 converting완료
-     */
-    @Override
-    public void insertHomeworkByEmail(String email, int studyId, Date created_at) throws AddException {
-        log.info("insertHomeworkByEmail 시작 email: " + email + "studyId: "+ studyId +"created_at: "+ created_at);
-        SqlSession session = null;
-        try {
-            session = sqlSessionFactory.openSession();
-            Map<String, Object> map = new HashMap<>();
-            map.put("email", email);
-            map.put("studyId", studyId);
-            map.put("created_at", created_at);
-            session.insert("com.dogroup.mybatis.StudyMapper.insertHomeworkByEmail", map);
+	/**
+	 * 스터디회원의 과제를 insert한다
+	 * 
+	 * @author kangb MyBatis로 converting완료
+	 */
+	@Override
+	public void insertHomeworkByEmail(String email, int studyId, Date created_at) throws AddException {
+		log.info("insertHomeworkByEmail 시작 email: " + email + "studyId: " + studyId + "created_at: " + created_at);
+		SqlSession session = null;
+		try {
+			session = sqlSessionFactory.openSession();
+			Map<String, Object> map = new HashMap<>();
+			map.put("email", email);
+			map.put("studyId", studyId);
+			map.put("created_at", created_at);
+			session.insert("com.dogroup.mybatis.StudyMapper.insertHomeworkByEmail", map);
 
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new AddException("HomeWork Insert 실패");
-        } finally {
-            if (session != null) {
-                session.close();
-            }
-        }
-    }
-    
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new AddException("HomeWork Insert 실패");
+		} finally {
+			if (session != null) {
+				session.close();
+			}
+		}
+	}
+
 	/**
 	 * 스터디를 Insert 한다.
-	 * @throws AddException 
+	 * 
+	 * @throws AddException
 	 */
 	@Override
 	@Transactional(rollbackFor = AddException.class)
 	public void insertStudy(StudyDTO study) throws AddException {
 		log.info("insertStudy 시작");
-		
+
 		SqlSession session = null;
 		try {
 			session = sqlSessionFactory.openSession();
 			session.insert("com.dogroup.mybatis.StudyMapper.insertStudy", study);
-			
+
 			insertStudyUserLeader(study, session);
-			
+
 			insertStudySubject(study, session);
-		}catch (Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 			throw new AddException(e.getMessage());
 		} finally {
@@ -255,14 +257,15 @@ public class StudyRepositoryOracle implements StudyRepository {
 			log.info("insertStudy 끝");
 		}
 	}
-	
+
 	/**
 	 * 과목을 삭제한다.
+	 * 
 	 * @param session
 	 * @param study
 	 * @throws RemoveException
 	 */
-	public void deleteStudySubject( SqlSession session, int studyId) throws RemoveException {
+	public void deleteStudySubject(SqlSession session, int studyId) throws RemoveException {
 		session.delete("com.dogroup.mybatis.StudyMapper.deleteStudySubject", studyId);
 
 	}
@@ -280,11 +283,11 @@ public class StudyRepositoryOracle implements StudyRepository {
 
 		try {
 			session = sqlSessionFactory.openSession();
-			
+
 			// 스터디과목 삭제하기
 			deleteStudySubject(session, study.getStudyId());
-			
-			//스터디과목 insert하기
+
+			// 스터디과목 insert하기
 			List<StudySubjectDTO> subjectList = new ArrayList<>();
 			subjectList.addAll(study.getSubjects());
 
@@ -293,7 +296,7 @@ public class StudyRepositoryOracle implements StudyRepository {
 			}
 			session.insert("com.dogroup.mybatis.StudyMapper.insertStudySubject", study.getSubjects());
 			insertStudySubject(study, session);
-			
+
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new ModifyException(e.getMessage());
@@ -425,10 +428,14 @@ public class StudyRepositoryOracle implements StudyRepository {
 		Map<String, Object> map = new HashMap<>();
 		map.put("startRow", startRow);
 		map.put("endRow", endRow);
-		map.put("studyDTO",studyDTO);
+		map.put("studyDTO", studyDTO);
 		try {
 			session = sqlSessionFactory.openSession();
-			list = session.selectList("com.dogroup.mybatis.StudyMapper.selectStudy",map);
+
+			list = session.selectList("com.dogroup.mybatis.StudyMapper.selectStudy", map);
+
+			list = session.selectList("selectStudy", map);
+
 			return list;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -436,7 +443,7 @@ public class StudyRepositoryOracle implements StudyRepository {
 		} finally {
 			if (session != null) {
 				session.close();
-		}
+			}
 			log.info("selectStudy 종료");
 		}
 	}
@@ -450,7 +457,10 @@ public class StudyRepositoryOracle implements StudyRepository {
 		SqlSession session = null;
 		try {
 			session = sqlSessionFactory.openSession();
-			int count = session.selectOne("com.dogroup.mybatis.StudyMapper.studyCount",studyDTO);
+
+			int count = session.selectOne("com.dogroup.mybatis.StudyMapper.studyCount", studyDTO);
+
+			int count = session.selectOne("studyCount", studyDTO);
 			return count;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -459,7 +469,7 @@ public class StudyRepositoryOracle implements StudyRepository {
 			if (session != null) {
 				session.close();
 			}
-		log.info("studyCount 종료");
+			log.info("studyCount 종료");
 		}
 	}
 
@@ -544,35 +554,35 @@ public class StudyRepositoryOracle implements StudyRepository {
 	 * 스터디를 삭제한다. 스터디원, 스터디 과목 삭제 및 환불처리도 진행된다.
 	 */
 	@Override
-	@Transactional(rollbackFor = {RemoveException.class})
+	@Transactional(rollbackFor = { RemoveException.class })
 	public void deleteStudy(int studyId) throws RemoveException {
 		log.info("deleteStudy 시작 studyId: " + studyId);
-		
+
 		SqlSession session = null;
 		try {
 			session = sqlSessionFactory.openSession();
 			StudyDTO study = selectStudyByStudyId(studyId);
 			List<StudyUserDTO> list = selectStudyUsersByStudyId(studyId);
-			
-			//스터디원탈퇴처리
-			for(StudyUserDTO su : list) {
+
+			// 스터디원탈퇴처리
+			for (StudyUserDTO su : list) {
 				deleteStudyUser(study, su.getEmail());
 			}
-			//과목삭제
+			// 과목삭제
 			session.delete("com.dogroup.mybatis.StudyMapper.deleteStudySubject", studyId);
-			//스터디삭제: 외래키때문에 delete가 불가함, 대신 size를 -1로 변경
+			// 스터디삭제: 외래키때문에 delete가 불가함, 대신 size를 -1로 변경
 			session.delete("com.dogroup.mybatis.StudyMapper.updateStudyStatus", studyId);
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new RemoveException(e.getMessage());
 		} finally {
-			if(session != null) {
+			if (session != null) {
 				session.close();
 			}
 			log.info("deleteStudy 끝");
 		}
 	}
-	
+
 	/**
 	 * 회원의 이메일로 현재 진행중인 깃 방식 스터디를 조회한다. 스터디가 존재하면 FindException을 터뜨린다.
 	 */
@@ -582,8 +592,13 @@ public class StudyRepositoryOracle implements StudyRepository {
 		SqlSession session = null;
 		try {
 			session = sqlSessionFactory.openSession();
+
 			int num = session.selectOne("com.dogroup.mybatis.StudyMapper.selectCurrentlyStudyByEmail", email);
 			if(num != 0) {
+
+			int num = session.selectOne("selectCurrentlyStudyByEmail", email);
+			if (num != 0) {
+
 				throw new FindException("현재 이미 깃방식의 참여중인 스터디가 있습니다.");
 			}
 		} catch (FindException e) {
@@ -599,6 +614,7 @@ public class StudyRepositoryOracle implements StudyRepository {
 
 	/**
 	 * 과목들을 모두 가져온다.
+	 * 
 	 * @return
 	 * @throws FindException
 	 */
@@ -613,10 +629,34 @@ public class StudyRepositoryOracle implements StudyRepository {
 			e.printStackTrace();
 			throw new FindException(e.getMessage());
 		} finally {
-			if(session != null) {
+			if (session != null) {
 				session.close();
 			}
 			log.info("selectSubject 끝");
 		}
+	}
+
+	/**
+	 * 스터디장이 지금까지 완료했던 스터디의 개수를 반환
+	 */
+	@Override
+	public int selectStudyLeaderFinishStudy(String email) throws FindException {
+		log.info("selectStudyLeaderFinishStudy 시작");
+		SqlSession session = null;
+		int cnt = 0;
+		try {
+			session = sqlSessionFactory.openSession();
+			cnt = session.selectOne("com.dogroup.mybatis.StudyMapper.selectStudyLeaderFinishStudy", email);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+
+		} finally {
+			if (session != null) {
+				session.close();
+			}
+			log.info("selectStudyLeaderFinishStudy 끝");
+		}
+		return cnt;
 	}
 }

@@ -48,7 +48,7 @@ public class StudyRepositoryOracle implements StudyRepository {
 		map.put("studyDTO", studyOption);
 		try {
 			session = sqlSessionFactory.openSession();
-			List<StudyDTO> list = session.selectList("selectStudyByEmail", map);
+			List<StudyDTO> list = session.selectList("com.dogroup.mybatis.StudyMapper.selectStudyByEmail", map);
 			return list;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -74,7 +74,7 @@ public class StudyRepositoryOracle implements StudyRepository {
 		map.put("studyDTO", studyOption);
 		try {
 			session = sqlSessionFactory.openSession();
-			int Count = session.selectOne("myStudyCount", map);
+			int Count = session.selectOne("com.dogroup.mybatis.StudyMapper.myStudyCount", map);
 			return Count;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -151,7 +151,7 @@ public class StudyRepositoryOracle implements StudyRepository {
 		List<HomeworkDTO> list = null;
 		try {
 			session = sqlSessionFactory.openSession();
-			list = session.selectList("selectHomeworkByStudyId", studyId);
+			list = session.selectList("com.dogroup.mybatis.StudyMapper.selectHomeworkByStudyId", studyId);
 			if (list == null) {
 				return new ArrayList<>();
 			}
@@ -185,7 +185,7 @@ public class StudyRepositoryOracle implements StudyRepository {
 		map.put("studyId", studyId);
 		try {
 			session = sqlSessionFactory.openSession();
-			list = session.selectList("selectUserHomeworkByEmail", map);
+			list = session.selectList("com.dogroup.mybatis.StudyMapper.selectUserHomeworkByEmail", map);
 			if (list == null) {
 				return new ArrayList<>();
 			}
@@ -428,7 +428,7 @@ public class StudyRepositoryOracle implements StudyRepository {
 		map.put("studyDTO",studyDTO);
 		try {
 			session = sqlSessionFactory.openSession();
-			list = session.selectList("selectStudy",map);
+			list = session.selectList("com.dogroup.mybatis.StudyMapper.selectStudy",map);
 			return list;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -450,7 +450,7 @@ public class StudyRepositoryOracle implements StudyRepository {
 		SqlSession session = null;
 		try {
 			session = sqlSessionFactory.openSession();
-			int count = session.selectOne("studyCount",studyDTO);
+			int count = session.selectOne("com.dogroup.mybatis.StudyMapper.studyCount",studyDTO);
 			return count;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -582,7 +582,7 @@ public class StudyRepositoryOracle implements StudyRepository {
 		SqlSession session = null;
 		try {
 			session = sqlSessionFactory.openSession();
-			int num = session.selectOne("selectCurrentlyStudyByEmail", email);
+			int num = session.selectOne("com.dogroup.mybatis.StudyMapper.selectCurrentlyStudyByEmail", email);
 			if(num != 0) {
 				throw new FindException("현재 이미 깃방식의 참여중인 스터디가 있습니다.");
 			}

@@ -3,14 +3,40 @@
   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.dogroup.mybatis.WalletMapper">
-	<select id="selectWallet" parameterType="String" resultType="WalletDTO">
+	<resultMap id="walletResultMap" type="WalletDTO">
+		<id property="transactionNo" column="transaction_no"/>
+		<result property="email" column="user_email"/>
+		<result property="walletBalance" column="wallet_balance"/>
+		<result property="transactionDate" column="transaction_date"/>
+		<result property="transactionUser" column="transaction_user"/>
+		<result property="transactionCategory" column="transaction_category"/>
+		<result property="transactionMoney" column="transaction_money"/>
+		<association property="study" javaType="StudyDTO">
+			<result property="studyId" column="study_id"/>
+			<result property="studyTitle" column="study_title"/>
+		</association>
+	</resultMap>
+	
+	<select id="selectWallet" parameterType="String" resultMap="walletResultMap">
 		SELECT
-			*
+			w.transaction_no,
+			w.user_email,
+			w.wallet_balance,
+			w.transaction_date,
+			s.study_id,
+			s.study_title,
+			w.transaction_user,
+			w.transaction_category,
+			w.transaction_money
 		FROM
-			wallet
+			wallet w
+		LEFT JOIN study s ON s.study_id = w.study_id
 		WHERE
-			user_email = #{email}
+			w.user_email = #{email}
+		ORDER BY
+			w.transaction_no DESC
 	</select>
+	
 	<update id="updateUserBalance" statementType="CALLABLE" parameterType="hashmap">
 		{ CALL proc_userwallet (
 			#{flag},
@@ -20,4 +46,13 @@
 			#{transactionMoney}
 		)}
 	</update>
+	
+	<select id="selectWalletTotalCnt" parameterType="String" resultType="int">
+		SELECT
+			COUNT(*)
+		FROM
+			wallet
+		WHERE
+			user_email = #{email}
+	</select>
 </mapper>

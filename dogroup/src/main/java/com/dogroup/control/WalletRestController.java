@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.dogroup.dto.PageBean;
 import com.dogroup.dto.WalletDTO;
 import com.dogroup.exception.FindException;
 import com.dogroup.service.WalletService;
@@ -80,8 +81,9 @@ public class WalletRestController {
 		
 		String email = (String) session.getAttribute("loginedId");
 		List<WalletDTO> walletList = walletService.searchTransactionListAll(email);
+		PageBean<WalletDTO> pb = new PageBean<>(currentPage, walletList, walletService.getWalletTotalCnt(email));
 		
 		log.info("walletList 끝");
-		return new ResponseEntity<>(walletList, HttpStatus.OK);
+		return new ResponseEntity<>(pb, HttpStatus.OK);
 	}
 }

@@ -16,12 +16,12 @@ public class WalletRepositoryTest {
 	@Autowired
 	WalletRepository walletRepository;
 	
-	@Test
+//	@Test
 	void 프로시저테스트() throws Exception {
-		WalletDTO wallet = new WalletDTO(0, "user9@gmail.com", 0, null, 0, "기업은행", 3, 1000);
+//		WalletDTO wallet = new WalletDTO(0, "user9@gmail.com", 0, null, 0, "기업은행", 3, 1000);
 		int flag = 1;
 		
-		walletRepository.updateUserBalance(wallet, flag);
+//		walletRepository.updateUserBalance(wallet, flag);
 	}
 
 }

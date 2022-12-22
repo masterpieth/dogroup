@@ -23,5 +23,11 @@ public interface WalletRepository {
 	 */
 	void updateUserBalance(WalletDTO wallet, int flag) throws ModifyException;
 
-
+	/**
+	 * 사용자의 지갑 총 갯수를 반환한다.
+	 * @param email
+	 * @return
+	 * @throws FindException
+	 */
+	int selectWalletTotalCnt(String email) throws FindException; 
 }

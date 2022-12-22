@@ -86,4 +86,23 @@ public class WalletRepositoryOracle implements WalletRepository {
 			log.info("updateUserBalance 끝");
 		}
 	}
+
+	@Override
+	public int selectWalletTotalCnt(String email) throws FindException {
+		log.info("selectWalletTotalCnt 시작: email" + email);
+		
+		SqlSession session = null;
+		try {
+			session = sqlSessionFactory.openSession();
+			return session.selectOne("com.dogroup.mybatis.WalletMapper.selectWalletTotalCnt", email);
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new FindException("전체 개수 조회에 실패했습니다.");
+		} finally {
+			if(session != null) {
+				session.close();
+			}
+			log.info("selectWalletTotalCnt 끝");
+		}
+	}
 }

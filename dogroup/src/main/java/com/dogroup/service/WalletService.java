@@ -62,4 +62,14 @@ public class WalletService {
 			throw new AddException();
 		}
 	}
+	
+	/**
+	 * 사용자 지갑 내역의 총 갯수를 반환한다.
+	 * @param email
+	 * @return		지갑내역 총 갯수
+	 * @throws FindException 
+	 */
+	public int getWalletTotalCnt(String email) throws FindException {
+		return repository.selectWalletTotalCnt(email);
+	}
 }

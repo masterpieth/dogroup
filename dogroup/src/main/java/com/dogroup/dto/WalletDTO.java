@@ -1,6 +1,8 @@
 package com.dogroup.dto;
 
-import java.sql.Date;
+import com.fasterxml.jackson.annotation.JsonFormat;
+
+import java.util.Date;
 
 /**
  * 지갑 DTO
@@ -11,8 +13,9 @@ public class WalletDTO {
 	private int transactionNo;			//거래번호(PK)
 	private String email;				//User 이메일
 	private int walletBalance;			//User 현재 총잔액
-	private Date transcationDate;		//거래일자
-	private int studyId;				//스터디 ID(스터디 관련 거래일경우 - 아닐 경우에는 NULL
+	@JsonFormat(shape= JsonFormat.Shape.STRING, pattern="yyyy-MM-dd", timezone="Asia/Seoul")
+	private Date transactionDate;		//거래일자
+	private StudyDTO study;				//스터디
 	private String transactionUser;		//거래자(통장입출금 관련 거래일 경우 - 아닐 경우에는 NULL
 	private int transactionCategory;	//거래유형(1 : 정산금액(환급금)/2: 입장료/3: 충전금/4: 인출금
 	private int transactionMoney;		//거래금액
@@ -20,15 +23,15 @@ public class WalletDTO {
 	public WalletDTO() {
 		super();
 	}
-	
-	public WalletDTO(int transactionNo, String email, int walletBalance, Date transcationDate, int studyId,
+
+	public WalletDTO(int transactionNo, String email, int walletBalance, Date transactionDate, StudyDTO study,
 			String transactionUser, int transactionCategory, int transactionMoney) {
 		super();
 		this.transactionNo = transactionNo;
 		this.email = email;
 		this.walletBalance = walletBalance;
-		this.transcationDate = transcationDate;
-		this.studyId = studyId;
+		this.transactionDate = transactionDate;
+		this.study = study;
 		this.transactionUser = transactionUser;
 		this.transactionCategory = transactionCategory;
 		this.transactionMoney = transactionMoney;
@@ -58,20 +61,20 @@ public class WalletDTO {
 		this.walletBalance = walletBalance;
 	}
 
-	public Date getTranscationDate() {
-		return transcationDate;
+	public Date getTransactionDate() {
+		return transactionDate;
 	}
 
-	public void setTranscationDate(Date transcationDate) {
-		this.transcationDate = transcationDate;
+	public void setTransactionDate(Date transactionDate) {
+		this.transactionDate = transactionDate;
 	}
 
-	public int getStudyId() {
-		return studyId;
+	public StudyDTO getStudy() {
+		return study;
 	}
 
-	public void setStudyId(int studyId) {
-		this.studyId = studyId;
+	public void setStudy(StudyDTO study) {
+		this.study = study;
 	}
 
 	public String getTransactionUser() {
@@ -97,12 +100,5 @@ public class WalletDTO {
 	public void setTransactionMoney(int transactionMoney) {
 		this.transactionMoney = transactionMoney;
 	}
-
-	@Override
-	public String toString() {
-		return "WalletDTO [transactionNo=" + transactionNo + ", email=" + email + ", walletBalance=" + walletBalance
-				+ ", transcationDate=" + transcationDate + ", studyId=" + studyId + ", transactionUser="
-				+ transactionUser + ", transactionCategory=" + transactionCategory + ", transactionMoney="
-				+ transactionMoney + "]";
-	}
+	
 }

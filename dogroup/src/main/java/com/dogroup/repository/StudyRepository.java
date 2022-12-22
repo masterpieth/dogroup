@@ -28,24 +28,27 @@ public interface StudyRepository {
 
 	/**
 	 * 유저의 email로 진행한 (검색 조건에 해당하는)스터디 정보를 반환한다.
+	 * 
 	 * @param currentPage 현재 페이지
-	 * @param cntPerPage 페이당 보여줄 스터디 개수
+	 * @param cntPerPage  페이당 보여줄 스터디 개수
 	 * @param studyOption 검색 조건을 담고있는 객체
-	 * @param email 유저의 이메일
+	 * @param email       유저의 이메일
 	 * @return 검색 조건에 해당하는 스터디 리스트
 	 * @throws FindException
 	 */
-	List<StudyDTO> selectStudyByEmail(int currentPage, int cntPerPage, StudyDTO studyDTO, String email) throws FindException;
+	List<StudyDTO> selectStudyByEmail(int currentPage, int cntPerPage, StudyDTO studyDTO, String email)
+			throws FindException;
 
 	/**
 	 * 유저의 email로 진행한 (검색 조건에 해당하는)스터디의 갯수를 반환한다.
+	 * 
 	 * @param studyOption 검색 조건을 담고있는 객체
-	 * @param email 유저의 이메일
+	 * @param email       유저의 이메일
 	 * @return 검색 조건에 해당하는 스터디의 갯수
 	 * @throws FindException
 	 */
 	int myStudyCount(StudyDTO studyDTO, String email) throws FindException;
-	
+
 	/**
 	 * 스터디원의 email로 스터디원의 List<HomeworkDTO> 리스트 반환한다.
 	 * 
@@ -84,6 +87,7 @@ public interface StudyRepository {
 
 	/**
 	 * 스터디를 update한다
+	 * 
 	 * @param study 업데이트할 스터디 내용
 	 * @throws ModiftException 업데이트 중 오류시 발생한다.
 	 */
@@ -96,8 +100,7 @@ public interface StudyRepository {
 	void insertStudyUser(StudyDTO study, String email) throws AddException;
 
 	/**
-	 * 스터디장을 insert 한다
-	 * flag 1: 스터디원 추가 flag 0: 스터디원 삭제
+	 * 스터디장을 insert 한다 flag 1: 스터디원 추가 flag 0: 스터디원 삭제
 	 */
 	void insertStudyUserLeader(StudyDTO study, SqlSession session) throws AddException;
 
@@ -112,48 +115,54 @@ public interface StudyRepository {
 
 	/**
 	 * 스터디 과목을 insert 한다
-	 * @param study				스터디 정보
-	 * @param subjects			스터디과목들
-	 * @param conn				insertStudy시의 connection
-	 * @throws AddException		실패시 발생시킬 예외
+	 * 
+	 * @param study    스터디 정보
+	 * @param subjects 스터디과목들
+	 * @param conn     insertStudy시의 connection
+	 * @throws AddException 실패시 발생시킬 예외
 	 */
 	void insertStudySubject(StudyDTO study, SqlSession session) throws AddException;
-	
+
 	/**
 	 * 검색 조건에 맞는 스터디 리스트를 반환한다.
+	 * 
 	 * @param currentPage 현재 페이지
-	 * @param cntPerPage 페이지당 보여줄 스터디 갯수
+	 * @param cntPerPage  페이지당 보여줄 스터디 갯수
 	 * @param studyOption 검색 조건을 담고있는 객체
 	 * @return 검색 조건에 맞는 스터디 리스트
 	 * @throws FindException
 	 */
 	List<StudyDTO> selectStudy(int currentPage, int cntPerPage, StudyDTO studyOption) throws FindException;
-	
+
 	/**
 	 * 검색 조건에 맞는 스터디의 갯수를 반환한다.
+	 * 
 	 * @param studyOption 검색 조건을 담고있는 객체
 	 * @return 검색 조건에 맞는 스터디의 갯수
 	 * @throws FindException
 	 */
 	int studyCount(StudyDTO studyOption) throws FindException;
-	
+
 	/**
 	 * 회원의 성실도를 반환한다.
+	 * 
 	 * @param email
 	 * @return 회원의 성실도
-	 * @throws FindException 
+	 * @throws FindException
 	 */
 	int searchUserDeligence(String email) throws FindException;
-	
+
 	/**
 	 * 회원의 성실도를 반영한다. (스터디 종료 성실도 결과 반영)
+	 * 
 	 * @param studyUser
-	 * @throws ModifyException 
+	 * @throws ModifyException
 	 */
 	void setUserDeligence(StudyUserDTO studyUser) throws ModifyException;
 
 	/**
 	 * 회원에게 스터디 종료에 따른 금액을 환급한다.
+	 * 
 	 * @param email
 	 * @param i
 	 */
@@ -161,15 +170,17 @@ public interface StudyRepository {
 
 	/**
 	 * 스터디원 목록과 스터디원의 회원 정보를 반환한다.
-	 * @author kangb 
+	 * 
+	 * @author kangb
 	 * @param studyId
 	 * @throws FindException
 	 */
 	List<StudyUserDTO> selectStudyUsersByStudyId(int studyId) throws FindException;
-	
+
 	/**
 	 * 스터디ID에 해당하는 과목들을 삭제한다.
-	 * @param studyDTO	스터디 ID
+	 * 
+	 * @param studyDTO 스터디 ID
 	 * @throws RemoveException
 	 */
 	void deleteStudySubject(SqlSession session, int studyId) throws RemoveException;
@@ -180,16 +191,26 @@ public interface StudyRepository {
 	void deleteStudy(int studyId) throws RemoveException;
 
 	/**
-	 * 회원의 이메일로 현재 진행중인 깃 방식 스터디를 조회한다. 
+	 * 회원의 이메일로 현재 진행중인 깃 방식 스터디를 조회한다.
+	 * 
 	 * @param email
 	 * @throws FindException 스터디가 존재하면 FindException을 터뜨린다.
 	 */
 	void selectCurrentlyStudyByEmail(String email) throws FindException;
-	
+
 	/**
 	 * 과목들을 모두 가져온다.
+	 * 
 	 * @return
 	 * @throws FindException
 	 */
 	List<SubjectDTO> selectSubject() throws FindException;
+
+	/**
+	 * 스터디장이 지금까지 참여했던 스터디의 총 개수를 int타입으로 반환한다.
+	 * 
+	 * @return int(개수)
+	 * @throws FindException
+	 */
+	int selectStudyLeaderFinishStudy(String email) throws FindException;
 }

@@ -574,4 +574,14 @@ public class StudyService {
 	public List<SubjectDTO> getSubjectList() throws FindException {
 		return repository.selectSubject();
 	}
+	/**
+	 * 스터디장이 지금까지 참여완료했던 스터디의 개수를 반환(현재날짜보다 이전에참여했던)
+	 * @param email
+	 * @return int (개수)
+	 * @throws FindException
+	 */
+	public int searchStudyLeaderFinishStudy(String email) throws FindException{
+		return repository.selectStudyLeaderFinishStudy(email);
+	}
+	
 }

@@ -19,5 +19,4 @@ public class DogroupApplication {
 		log.info("DoGroup Spring Container 구동 시작");
 		SpringApplication.run(DogroupApplication.class, args);
 	}
-
 }

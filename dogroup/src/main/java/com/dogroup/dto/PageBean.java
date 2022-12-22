@@ -20,16 +20,20 @@ public class PageBean<T> {
 		
 		if(currentPage <= cntPerPageGroup/2) {
 			startPage = 1;
-			endPage = cntPerPageGroup;
+			endPage = startPage + cntPerPageGroup - 1;
+			endPage = endPage > totalPage ? totalPage : endPage;
 		}
-		else if(currentPage > (totalPage - cntPerPageGroup/2)) {
-			if(currentPage == totalPage) startPage = totalPage - cntPerPageGroup + 1;
-			else startPage = totalPage - cntPerPageGroup;
+		else if(currentPage >= (totalPage - cntPerPageGroup/2)) {
+			startPage = totalPage - cntPerPageGroup + 1;
 			endPage = totalPage;
+			startPage = startPage < 1 ? 1 : startPage;
+			endPage = endPage > totalPage ? totalPage : endPage;
 		}
 		else {
 			startPage = currentPage - cntPerPageGroup/2;
 			endPage = currentPage + cntPerPageGroup/2;
+			startPage = startPage < 1 ? 1 : startPage;
+			endPage = endPage < totalPage ? endPage : totalPage;
 		}
 	}
 

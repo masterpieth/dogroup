@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -39,9 +40,9 @@ public class WalletRestController {
 	 * @return
 	 * @throws Exception
 	 */
-	@PostMapping("deposit/{userEmail}")
-	public ResponseEntity<?> deposit(@PathVariable String userEmail, WalletDTO wallet) throws Exception {
-		log.info("deposit 시작: userEmail: " + userEmail);
+	@PostMapping("deposit")
+	public ResponseEntity<?> deposit(@RequestBody WalletDTO wallet) throws Exception {
+		log.info("deposit 시작");
 		
 		walletService.deposit(wallet);
 		
@@ -56,9 +57,9 @@ public class WalletRestController {
 	 * @return
 	 * @throws Exception
 	 */
-	@PostMapping("withdraw/{userEmail}")
-	public ResponseEntity<?> withdraw(@PathVariable String userEmail, WalletDTO wallet) throws Exception {
-		log.info("withdraw 시작: userEmail: " + userEmail);
+	@PostMapping("withdraw")
+	public ResponseEntity<?> withdraw(@RequestBody WalletDTO wallet) throws Exception {
+		log.info("withdraw 시작");
 		
 		walletService.withdraw(wallet);
 		

@@ -1,6 +1,8 @@
 package com.dogroup.control;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpSession;
 
@@ -51,11 +53,15 @@ public class StudyRestController {
 	@GetMapping("{studyId}")
 	public ResponseEntity<?> searchStudyInfo(@PathVariable int studyId) throws FindException {
 		log.info("searchStudyInfo(컨트롤러) 시작: studyId: " + studyId);
-		
 		StudyDTO study = studyService.searchStudyInfo(studyId);
+		List<SubjectDTO> subjects = studyService.getSubjectList();
+		
+		Map<String, Object> map = new HashMap<>();
+		map.put("study", study);
+		map.put("subjects", subjects);
 		
 		log.info("searchStudyInfo(컨트롤러) 끝");
-		return new ResponseEntity<>(study, HttpStatus.OK);
+		return new ResponseEntity<>(map, HttpStatus.OK);
 	}
 	
 	/**
@@ -102,8 +108,8 @@ public class StudyRestController {
 	 * @return
 	 * @throws Exception 
 	 */
-	@PostMapping
-	public ResponseEntity<?> openStudy(StudyDTO study) throws Exception {
+	@PostMapping(produces = "application/json;charset=utf-8")
+	public ResponseEntity<?> openStudy(@RequestBody StudyDTO study) throws Exception {
 		log.info("openStudy(컨트롤러) 시작");
 		
 		studyService.openStudy(study);
@@ -120,7 +126,7 @@ public class StudyRestController {
 	 * @throws ModifyException
 	 */
 	@PutMapping("{studyId}")
-	public ResponseEntity<?> modifyStudy(@PathVariable int studyId, StudyDTO study) throws ModifyException {
+	public ResponseEntity<?> modifyStudy(@PathVariable int studyId, @RequestBody StudyDTO study) throws ModifyException {
 		log.info("modifyStudy(컨트롤러) 시작");
 		
 		studyService.modifyStudy(study);

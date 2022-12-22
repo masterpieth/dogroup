@@ -1,7 +1,8 @@
 package com.dogroup.dto;
 
 import java.util.Date;
-import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 /**
  * 과제 관련 DTO
@@ -11,6 +12,7 @@ import java.util.List;
 public class HomeworkDTO {
     private int studyId; 	        //스터디 ID
     private String email;       //회원 ID
+    @JsonFormat(shape= JsonFormat.Shape.STRING, pattern="yyyy-MM-dd", timezone="Asia/Seoul")
     private Date studySubmitDt; 	//제출 날짜
 	
     public HomeworkDTO() {

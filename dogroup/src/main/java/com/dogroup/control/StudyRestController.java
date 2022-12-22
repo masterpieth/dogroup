@@ -276,4 +276,20 @@ public class StudyRestController {
 		log.info("subjectList(컨트롤러) 끝");
 		return new ResponseEntity<>(list, HttpStatus.OK);
 	}
+	
+	/**
+	 * 스터디 상세정보를 조회한다.
+	 * @param studyId
+	 * @param map
+	 * @return
+	 * @throws FindException
+	 */
+	@PostMapping("calendar/{studyId}")
+	public ResponseEntity<?> calender(@PathVariable int studyId, @RequestBody Map<String, String> map) throws FindException  {
+		log.info("calendar(컨트롤러) 시작" + map.get("email"));
+		StudyUserDTO user = studyService.searchMyStudyUserInfo(map.get("email"), studyId);
+		log.info("calender(컨트롤러) 종료");
+		return new ResponseEntity<>(user, HttpStatus.OK);
+		}
+
 }

@@ -196,17 +196,19 @@
 
 	<!-- 스터디원 목록과 스터디원의 회원 정보를 반환한다. -->
 	<select id = "studyUsers" resultMap="studyUsersResultMap" parameterType="int">
-	SELECT su.study_id,
-		   su.user_email,
-		   u.user_name,
-		   u.user_diligence,
-		   u.user_status
-	FROM 
+		SELECT su.study_id,
+		su.user_email,
+		u.user_name,
+		u.user_diligence,
+		u.user_status,
+		h.study_submit_dt
+		FROM
 		study_users su
-	JOIN 
+		JOIN
 		users u
-	ON su.user_email  = u.user_email
-	WHERE su.study_id = #{studyId}
+		ON su.user_email  = u.user_email
+		JOIN homework h ON h.study_id = su.study_id and h.user_email = su.user_email
+		WHERE su.study_id = #{studyId}
 	</select>
 	
 	<!-- 스터디회원의 과제를 insert한다 -->
@@ -504,6 +506,7 @@
 			 	 ]]>
       
 	</select>
+
 	<update id="updateStudyPaid" parameterType="int">
 		UPDATE
 			study
@@ -512,6 +515,22 @@
 		WHERE 
 			study_id = #{stduyId}
 	</update>
+
+	<!--스터디 가입 여부를 판단하기 위한 Select 문-->
+	<select id = "searchStudyUsersByEmail" resultMap="studyUsersResultMap" parameterType="hashmap">
+		SELECT
+			su.study_id,
+			su.user_email,
+			u.user_name,
+			u.user_diligence,
+			u.user_status
+		FROM
+		study_users su
+		JOIN
+		users u
+		ON su.user_email  = u.user_email
+		WHERE su.study_id = #{studyId} AND su.user_email = #{email}
+	</select>
 </mapper>
 
 

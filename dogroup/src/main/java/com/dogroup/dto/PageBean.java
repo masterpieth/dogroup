@@ -4,7 +4,7 @@ import java.util.List;
 
 public class PageBean<T> {
 	private int currentPage;// 현재페이지
-	public static final int CNT_PER_PAGE = 5; // 페이지당 보여줄 상품수
+	public static final int CNT_PER_PAGE = 8; // 페이지당 보여줄 상품수
 	private List<T> list; // 페이지에 해당하는 목록
 	private int totalCnt; // 총목록수
 	private int totalPage; // 총페이지수

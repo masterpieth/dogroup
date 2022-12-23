@@ -37,15 +37,16 @@ public class StudyService {
 	private Logger log = LoggerFactory.getLogger(getClass());
 	@Autowired
 	private StudyRepository repository;
-	
+
 	@Autowired
 	private UserService userService;
-	
+
 	/**
 	 * 스터디의 정보를 반환한다.
+	 *
 	 * @param studyId
-	 * @return스터디 스터디의 기본 정보를 반환한다. 스터디의 현재 참여자수 + 스터디장의 성실도 + 스터디의 과목 정보
 	 * @throws FindException
+	 * @return스터디 스터디의 기본 정보를 반환한다. 스터디의 현재 참여자수 + 스터디장의 성실도 + 스터디의 과목 정보
 	 */
 	public StudyDTO searchStudyInfo(int studyId) throws FindException {
 		return repository.selectStudyByStudyId(studyId);
@@ -53,6 +54,7 @@ public class StudyService {
 
 	/**
 	 * 스터디원의 상세정보를 조회한다.
+	 *
 	 * @param email   회원 email
 	 * @param studyId 스터디 id
 	 * @return StudyUserDTO(스터디 id, 과제 전체 제출 내역, 주차별 출석 인정 정보)
@@ -60,17 +62,17 @@ public class StudyService {
 	 */
 	public StudyUserDTO searchMyStudyUserInfo(String email, int studyId) throws FindException {
 		StudyUserDTO user = new StudyUserDTO(studyId, repository.selectUserHomeworkByEmail(email, studyId), null);
-		user.setEmail(email);
 		user = searchStudyUserHomeworkState(user);
 		return user;
 	}
 
 	/**
-	 * 유저가 참여한 (조건에 맞는)스터디 정보를 반환한다. 
+	 * 유저가 참여한 (조건에 맞는)스터디 정보를 반환한다.
+	 *
 	 * @param currentPage 현재 페이지
-	 * @param cntPerPage 페이지 당 보여줄 리스트 개수
+	 * @param cntPerPage  페이지 당 보여줄 리스트 개수
 	 * @param studyOption 스터디 검색 조건을 담고있는 객체
-	 * @param email 유저의 이메일
+	 * @param email       유저의 이메일
 	 * @return 조건에 해당하는 스터디 리스트를 반환한다.
 	 * @throws FindException
 	 */
@@ -80,9 +82,10 @@ public class StudyService {
 
 	/**
 	 * 유저가 참여한 (조건에 맞는)스터디 정보를 페이지 빈으로 반환한다.
+	 *
 	 * @param currentPage 현재 페이지
 	 * @param studyOption 스터디 검색 조건을 담고있는 객체
-	 * @param email 유저의 이메일
+	 * @param email       유저의 이메일
 	 * @return 조건에 해당하는 스터디 리스트를 페이지 빈으로 반환한다.
 	 * @throws FindException
 	 */
@@ -92,11 +95,12 @@ public class StudyService {
 		PageBean<StudyDTO> pageBean = new PageBean<>(currentPage, list, totalCnt);
 		return pageBean;
 	}
-	
+
 	/**
 	 * 스터디를 개설한다. 이미 참여중인 스터디(깃방식)가 있거나 돈이 없는 경우 개설에 실패한다.
+	 *
 	 * @param study
-	 * @throws FindException 
+	 * @throws FindException
 	 */
 	public void openStudy(StudyDTO study) throws Exception {
 		try {
@@ -110,16 +114,17 @@ public class StudyService {
 
 	/**
 	 * 스터디에 참여신청한다. 이미 참여중인 스터디(깃방식)가 있거나 돈이 없는 경우 또는 성실도가 커트라인보다 낮은 경우 참여에 실패한다.
+	 *
 	 * @param user
 	 * @param study
 	 * @throws AddException
 	 */
 	public void joinStudy(String email, StudyDTO study) throws Exception {
 		try {
-		compareUserBalanceWithStudyFee(study.getStudyFee(), email);
-		compareUserDiligenceWithStudyDiligenceCutline(study.getStudyDiligenceCutline(), email);
-		IsThereStudiesCurrentlyParticipatingIn(study.getStudyCertification(), email);
-		repository.insertStudyUser(study, email);
+			compareUserBalanceWithStudyFee(study.getStudyFee(), email);
+			compareUserDiligenceWithStudyDiligenceCutline(study.getStudyDiligenceCutline(), email);
+			IsThereStudiesCurrentlyParticipatingIn(study.getStudyCertification(), email);
+			repository.insertStudyUser(study, email);
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new Exception(e.getMessage());
@@ -128,7 +133,7 @@ public class StudyService {
 
 	/**
 	 * 스터디 참여를 취소한다. 스터디 유저가 삭제되며 환불처리도 함께 진행된다.
-	 * 
+	 *
 	 * @param study
 	 * @param email
 	 * @throws RemoveException
@@ -139,26 +144,27 @@ public class StudyService {
 
 	/**
 	 * 현재 참여중인 스터디중 깃방식으로 과제 제출하는 스터디가 있는지 검사한다.
+	 *
 	 * @param email
 	 * @throws FindException 참여중인 스터디가 있으면 FindException을 발생시킨다.
 	 */
-	private void IsThereStudiesCurrentlyParticipatingIn(int certification ,String email) throws FindException {
+	private void IsThereStudiesCurrentlyParticipatingIn(int certification, String email) throws FindException {
 		try {
-			if(certification == 1) {
-			repository.selectCurrentlyStudyByEmail(email);
+			if (certification == 1) {
+				repository.selectCurrentlyStudyByEmail(email);
 			}
 		} catch (FindException e) {
 			e.printStackTrace();
 			throw new FindException(e.getMessage());
 		}
 	}
-	
+
 	/**
 	 * 사용자의 잔액과 입장료를 비교하여 입장을 할 수 있는지 없는지를 반환한다.
-	 * 
+	 *
 	 * @return 스터디 입장료보다 잔액이 많으면 true / 스터디 입장료보다 잔액이 적어서 입장을 할 수 없으면 false
-	 * @throws AddException 
-	 * @throws FindException 
+	 * @throws AddException
+	 * @throws FindException
 	 */
 	private void compareUserBalanceWithStudyFee(int studyFee, String email) throws AddException, FindException {
 		try {
@@ -175,9 +181,10 @@ public class StudyService {
 
 	/**
 	 * 사용자의 성실도와 스터디의 성실도 커트라인을 비교하여 입장을 할 수 있는지 없는지를 반환한다.
+	 *
 	 * @return 스터디의 성실도 커트라인보다 사용자의 성실도가 높으면 true / 낮으면 false를 반환한다.
-	 * @throws AddException 
-	 * @throws FindException 
+	 * @throws AddException
+	 * @throws FindException
 	 */
 	private void compareUserDiligenceWithStudyDiligenceCutline(double studyDiligenceCutline, String email) throws AddException, FindException {
 		try {
@@ -194,7 +201,7 @@ public class StudyService {
 
 	/**
 	 * 버튼형 출석 과제를 체크한다. Insert 가 안될 경우 예외를 발생시킨다.
-	 * 
+	 *
 	 * @param email
 	 * @param studyId
 	 * @throws AddException
@@ -211,7 +218,7 @@ public class StudyService {
 
 	/**
 	 * Github 과제를 체크한다.
-	 * 
+	 *
 	 * @param email
 	 * @param studyId
 	 * @throws AddException
@@ -228,7 +235,7 @@ public class StudyService {
 
 	/**
 	 * GithubEvent를 읽어온다.
-	 * 
+	 *
 	 * @param email User의 이메일 정보
 	 * @return Date 과제날짜
 	 * @throws Exception
@@ -266,24 +273,24 @@ public class StudyService {
 				String type = (String) object.get("type");
 
 				switch (type) {
-				case "PushEvent":
-				case "PullRequestEvent":
-					String created_at = (String) object.get("created_at");
-					created_at = created_at.replace("T", " ");
-					created_at = created_at.replace("Z", "");
+					case "PushEvent":
+					case "PullRequestEvent":
+						String created_at = (String) object.get("created_at");
+						created_at = created_at.replace("T", " ");
+						created_at = created_at.replace("Z", "");
 
-					SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-					Date today = new Date();
-					Date eventUtilDate = (Date) formatter.parse(created_at);
+						SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+						Date today = new Date();
+						Date eventUtilDate = (Date) formatter.parse(created_at);
 
-					//날짜비교
-					long diff = (today.getTime() - eventUtilDate.getTime()); // 기준일자 스터디 시작일의 시간차이
-					TimeUnit time = TimeUnit.DAYS; // 시간차이를 날짜로 변환
-					double diffDays = (double) time.convert(diff, TimeUnit.MILLISECONDS);
+						//날짜비교
+						long diff = (today.getTime() - eventUtilDate.getTime()); // 기준일자 스터디 시작일의 시간차이
+						TimeUnit time = TimeUnit.DAYS; // 시간차이를 날짜로 변환
+						double diffDays = (double) time.convert(diff, TimeUnit.MILLISECONDS);
 
-					if (diffDays == 0.0) {
-						return eventUtilDate;
-					}
+						if (diffDays == 0.0) {
+							return eventUtilDate;
+						}
 				}
 			}
 			throw new FindException("이벤트를 찾을 수 없습니다.");
@@ -295,7 +302,7 @@ public class StudyService {
 
 	/**
 	 * github Api 에 요청을 보내서 결과로 받아온 Json을 String 형태로 반환한다.
-	 * 
+	 *
 	 * @param url 요청을 보낼 주소
 	 * @return api 결과값 String
 	 * @throws FindException
@@ -323,7 +330,7 @@ public class StudyService {
 
 	/**
 	 * 스터디원 모두의 주차별 출석(유효 과제 상태)을 조회한다.
-	 * 
+	 *
 	 * @param studyId 스터디 ID
 	 * @return List<StudyUserDTO> (studyId, email, checkHomework 정보)
 	 * @throws FindException
@@ -345,7 +352,7 @@ public class StudyService {
 			StudyUserDTO user = null;
 			String old_user_email = "";
 			List<HomeworkDTO> homeworkList = repository.selectHomeworkByStudyId(studyId); // 스터디의 전체 과제 내역을 가져온다.
-			
+
 			for (HomeworkDTO hw : homeworkList) {
 				String hwEmail = hw.getEmail();
 				if (!old_user_email.equals(hwEmail)) {
@@ -362,7 +369,7 @@ public class StudyService {
 				arr[index]++;
 			}
 			//제출 과제 횟수를 통해 해당 주차의 유효 제출 여부를 식별한다.
-			Map <String, Integer> studyUserExist = new HashMap(); //과제 제출 내역이 있는 유저는 맵에 저장
+			Map<String, Integer> studyUserExist = new HashMap(); //과제 제출 내역이 있는 유저는 맵에 저장
 			for (StudyUserDTO userCheck : homeworkTotalList) {
 				int[] Arr = userCheck.getCheckHomework();
 				for (int i = 0; i < Arr.length; i++) {
@@ -372,8 +379,8 @@ public class StudyService {
 			}
 			//과제 제출을 하지 않은 사람은 유효 과제 개수를 0개로 리스트에 추가해준다.
 			List<StudyUserDTO> studyAllUser = repository.selectStudyUsersByStudyId(studyId);
-			for(StudyUserDTO studyUser : studyAllUser) {
-				if(!studyUserExist.containsKey(studyUser.getEmail())) {
+			for (StudyUserDTO studyUser : studyAllUser) {
+				if (!studyUserExist.containsKey(studyUser.getEmail())) {
 					int[] cehckHomework = {0};
 					studyUser.setCheckHomework(cehckHomework);
 					homeworkTotalList.add(studyUser);
@@ -388,7 +395,7 @@ public class StudyService {
 
 	/**
 	 * 스터디원 개인의 주차별 출석(유효 과제 상태)을 조회한다.
-	 * 
+	 *
 	 * @param studyId
 	 * @param email
 	 * @return StudyUserDTO
@@ -436,8 +443,9 @@ public class StudyService {
 
 	/**
 	 * 검색 조건에 맞는 스터디 리스트를 반환한다.
+	 *
 	 * @param currentPage 현재 페이지
-	 * @param cntPerPage 페이지당 보여줄 스터디 개수
+	 * @param cntPerPage  페이지당 보여줄 스터디 개수
 	 * @param studyOption 검색 조건을 담고있는 객체
 	 * @return 검색 조건에 맞는 스터디 리스트
 	 * @throws FindException
@@ -445,9 +453,10 @@ public class StudyService {
 	public List<StudyDTO> searchStudy(int currentPage, int cntPerPage, StudyDTO studyOption) throws FindException {
 		return repository.selectStudy(currentPage, cntPerPage, studyOption);
 	}
-	
+
 	/**
 	 * 검색 조건에 맞는 스터디 리스트를 페이지빈으로 반환한다.
+	 *
 	 * @param currentPage 현재 페이지
 	 * @param studyOption 검색 조건을 담고있는 객체
 	 * @return 조건에 맞는 스터디 목록의 페이지빈
@@ -459,52 +468,53 @@ public class StudyService {
 		PageBean<StudyDTO> pageBean = new PageBean<>(currentPage, list, totalCnt);
 		return pageBean;
 	}
-	
+
 	/**
 	 * 스터디 종료시 상금을 분배(일괄 정산)한다.
+	 *
 	 * @param study
-	 * @throws FindException 
-	 * @throws ModifyException 
+	 * @throws FindException
+	 * @throws ModifyException
 	 */
 	public void distributePrizeMoney(int studyId) throws FindException, ModifyException {
 		//0. 스터디 정보 가져오기 기본 정보 + 스터디장 userId
 		StudyDTO study = repository.selectStudyByStudyId(studyId);
 		//1. 스터디원 모두의 주차별 출석(유효 과제 상태)을 조회한다.
 		List<StudyUserDTO> studyUsers = searchMyStudyHomeworkState(studyId);
-		
+
 		//2. 스터디의 진행 기간과 입장금액 정보를 가져온다.
 		int studyFee = study.getStudyFee(); //현재 스터디의 입장 요금은 얼마인가?
 		int howLongStudyWeek = studyUsers.get(0).getCheckHomework().length; //스터디가 몇주차인가?
-		
+
 		//3. 스터디원의 달성률 계산 후 개인의 1차 환금액 스터디 누적 환금액를 구한다.
 		int studyGatheredSize = study.getStudyGatheredSize(); //스터디 진행 인원 수는?
 		int studyPrize = studyFee * studyGatheredSize; //우선 스터디의 누적 벌금은 스터디 입장금액 * 스터디 인원수로 계산한 후 스터디원의 1차 환급액을 참가하는 방식으로 계산한다.
 		Map<String, Integer> studyUserRefundInfo = new HashMap<>(); //1차 환금액 정보를 담을 Map
-		
-		for(StudyUserDTO studyUser : studyUsers) {
+
+		for (StudyUserDTO studyUser : studyUsers) {
 			int[] checkHomework = studyUser.getCheckHomework(); //스터디원의 주차별 유효과제 제출 리스트를 가져온다.
-			int validHomeworkCnt = 0; 
+			int validHomeworkCnt = 0;
 			for (int i : checkHomework) { //스터디원의 유효 과제 제출 개수를 계산한다.
-				if(i == 1) validHomeworkCnt++;
+				if (i == 1) validHomeworkCnt++;
 			}
 			double studyAchievementRate; //스터디원의 스터디 달성률을 계산한다. (유효과제 개수 / 진행 주차) 0~1 사이값
-			if(validHomeworkCnt == 0 ) studyAchievementRate = 0;
-			else studyAchievementRate = (double)validHomeworkCnt / howLongStudyWeek;	
-			
+			if (validHomeworkCnt == 0) studyAchievementRate = 0;
+			else studyAchievementRate = (double) validHomeworkCnt / howLongStudyWeek;
+
 			//금액의 최소 단위는 10원으로 한다.
-			double studyUserRefund = (double)studyFee * (studyAchievementRate);//1차 환금액 : 1차로 스터디원의 벌금을 제외한 환금 금액을 계산한다.
-			studyUserRefund = (int)(studyUserRefund + 9) / 10 * 10; // 1의 자릿수에서 올림
+			double studyUserRefund = (double) studyFee * (studyAchievementRate);//1차 환금액 : 1차로 스터디원의 벌금을 제외한 환금 금액을 계산한다.
+			studyUserRefund = (int) (studyUserRefund + 9) / 10 * 10; // 1의 자릿수에서 올림
 			studyPrize -= studyUserRefund; // 전체 studyPenalty에서 스터디원 개개인의 1차 환급액을 차감하여 공동 상금을 구한다.
-			studyUserRefundInfo.put(studyUser.getEmail(), (int)studyUserRefund); //스터디원 email을 key로, 1차 환금액을 value로 저장한다.
+			studyUserRefundInfo.put(studyUser.getEmail(), (int) studyUserRefund); //스터디원 email을 key로, 1차 환금액을 value로 저장한다.
 		}
 		//4. 1차 환금액과 스터디 누적 환금액을 n등분하여 스터디 유저에게 환급한다. 스터디의 STUDY_PAID 값을 TRUE(1)로 준다.
 		String studyLeaderEmail = study.getStudyLeader().getEmail();
-		int userPrize = (int)studyPrize/studyGatheredSize; //스터디 전체 상금을 스터디 인원으로 나눈 값(정수)
-		int prizeMod = studyPrize%studyGatheredSize; //스터디 전체 상금을 나누고 남은 금액(정수)
-		int userPrizeRound = (userPrize/10)*10;	//유저상금 1의자리 버림 연산
-		for(StudyUserDTO studyUser : studyUsers) {
+		int userPrize = (int) studyPrize / studyGatheredSize; //스터디 전체 상금을 스터디 인원으로 나눈 값(정수)
+		int prizeMod = studyPrize % studyGatheredSize; //스터디 전체 상금을 나누고 남은 금액(정수)
+		int userPrizeRound = (userPrize / 10) * 10;    //유저상금 1의자리 버림 연산
+		for (StudyUserDTO studyUser : studyUsers) {
 			String email = studyUser.getEmail();
-			if(studyUser.getEmail().equals(studyLeaderEmail)) {
+			if (studyUser.getEmail().equals(studyLeaderEmail)) {
 				//스터디장인 경우 자투리 금액을 추가로 가져간다. n등분한 유저상금 + 자투리 금액 + 스터디원들의 1의자리 버림 금액 액수
 				userPrizeRound = userPrizeRound + prizeMod + (userPrize - userPrizeRound) * studyGatheredSize;
 			}
@@ -512,11 +522,12 @@ public class StudyService {
 			//환금액의 소수점 계산을 어떻게 처리할 것인가? -> 스터디장이 자투리 금액을 가져간다.
 		}
 	}
-	
+
 	/**
 	 * 스터디 종료시 스터디원들의 개인의 달성률에 따른 성실도를 반영한다.
+	 *
 	 * @param study
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	public void updateStudyUserDiligence(int studyId) throws Exception {
 		//1. 스터디원 모두의 주차별 출석(유효 과제 상태)을 조회한다.
@@ -524,74 +535,86 @@ public class StudyService {
 		//2. 스터디의 성실도 정보를 가져온다.(최대 성실도 보상 값)
 		int howLongStudyWeek = studyUsers.get(0).getCheckHomework().length; //현재 스터디가 몇주 차인가?
 		int studyDeligence; //스터디의 주차를 기준으로 보상 성실도 최대값 부여(6주 단위로 성실도 2추가, 최대 성실도는 10)
-		if(howLongStudyWeek>=25) studyDeligence = 10;
-		else if(howLongStudyWeek == 1) studyDeligence = 2;
-		else studyDeligence = ((howLongStudyWeek-1)/6)*2 + 2;
+		if (howLongStudyWeek >= 25) studyDeligence = 10;
+		else if (howLongStudyWeek == 1) studyDeligence = 2;
+		else studyDeligence = ((howLongStudyWeek - 1) / 6) * 2 + 2;
 		//3. 스터디원의 달성률 계산 후 성실도를 계산한다.
-		for(StudyUserDTO studyUser : studyUsers) {
+		for (StudyUserDTO studyUser : studyUsers) {
 			String email = studyUser.getEmail();
 			int[] checkHomework = studyUser.getCheckHomework(); //스터디원의 주차별 유효과제 제출 리스트를 가져온다.
-			int validHomeworkCnt = 0; 
+			int validHomeworkCnt = 0;
 			for (int i : checkHomework) { //스터디원의 유효 과제 제출 개수를 계산한다.
-				if(i == 1) validHomeworkCnt++;
+				if (i == 1) validHomeworkCnt++;
 			}
 			double studyAchievementRate; //스터디원의 스터디 달성률을 계산한다. (유효과제 개수 / 진행 주차) 0~1 사이값
-			if(validHomeworkCnt == 0 ) studyAchievementRate = 0;
-			else studyAchievementRate = (double)validHomeworkCnt / howLongStudyWeek;	
-			double updateDeligeence = studyDeligence * (1.5 * studyAchievementRate - 0.5);	//스터디 달성률 3/1선 부터는 성실도 차감
+			if (validHomeworkCnt == 0) studyAchievementRate = 0;
+			else studyAchievementRate = (double) validHomeworkCnt / howLongStudyWeek;
+			double updateDeligeence = studyDeligence * (1.5 * studyAchievementRate - 0.5);    //스터디 달성률 3/1선 부터는 성실도 차감
 			int deligence = repository.searchUserDeligence(email); //현재 스터디원의 성실도 정보 가져오기
-		//4. 스터디원의 성실도 부여
+			//4. 스터디원의 성실도 부여
 			studyUser.setDiligence(deligence + updateDeligeence); //현재 성실도에 스터디 종료 결과 성실도 보상 반영
 			repository.setUserDeligence(studyUser);
 		}
 	}
-	
+
 	/**
 	 * 스터디 종료시 필요한 작업을 수행한다.(상금과 성실도를 반영)
+	 *
 	 * @param study
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	public void endStudy(int studyId) throws Exception {
 		distributePrizeMoney(studyId);
 		updateStudyUserDiligence(studyId);
 		repository.updateStudyPaid(studyId);
 	}
-	
+
 	/**
 	 * 스터디 내용을 수정한다. 성실도 기준 및 입장료는 바뀌지 않는다.
+	 *
 	 * @param study
-	 * @throws ModifyException 
+	 * @throws ModifyException
 	 */
 	public void modifyStudy(StudyDTO study) throws ModifyException {
 		repository.updateStudy(study);
 	}
-	
+
 	/**
 	 * 스터디를 삭제한다.
+	 *
 	 * @param studyId
 	 * @throws RemoveException
 	 */
 	public void deleteStudy(int studyId) throws RemoveException {
 		repository.deleteStudy(studyId);
 	}
-	
+
 	/**
 	 * 과목들을 가져온다.
-	 * @return	과목리스트
-	 * @throws FindException 
+	 *
+	 * @throws FindException
+	 * @return 과목리스트
 	 */
 	public List<SubjectDTO> getSubjectList() throws FindException {
 		return repository.selectSubject();
 	}
-	
+
 	/**
 	 * 스터디장이 지금까지 참여완료했던 스터디의 개수를 반환(현재날짜보다 이전에참여했던)
+	 *
 	 * @param email
 	 * @return int (개수)
 	 * @throws FindException
 	 */
-	public int searchStudyLeaderFinishStudy(String email) throws FindException{
+	public int searchStudyLeaderFinishStudy(String email) throws FindException {
 		return repository.selectStudyLeaderFinishStudy(email);
 	}
-	
+
+	public StudyUserDTO searchStudyUsersByEmail(Map<String, Object> map) throws FindException {
+		return repository.searchStudyUsersByEmail(map);
+	}
+
+	public List<StudyUserDTO> getStudyAllUser(int studyId) throws FindException {
+		return repository.selectStudyUsersByStudyId(studyId);
+	}
 }

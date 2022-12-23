@@ -2,6 +2,7 @@ package com.dogroup.repository;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.session.SqlSession;
 
@@ -219,4 +220,11 @@ public interface StudyRepository {
 	 * @param studyId
 	 */
 	void updateStudyPaid(int studyId);
+
+	/**
+	 * 스터디 가입 여부를 확인하기 위한 select문
+	 * @return
+	 * @throws FindException
+	 */
+	StudyUserDTO searchStudyUsersByEmail(Map<String, Object> map) throws FindException;
 }

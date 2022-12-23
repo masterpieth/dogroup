@@ -60,6 +60,7 @@ public class StudyService {
 	 */
 	public StudyUserDTO searchMyStudyUserInfo(String email, int studyId) throws FindException {
 		StudyUserDTO user = new StudyUserDTO(studyId, repository.selectUserHomeworkByEmail(email, studyId), null);
+		user.setEmail(email);
 		user = searchStudyUserHomeworkState(user);
 		return user;
 	}

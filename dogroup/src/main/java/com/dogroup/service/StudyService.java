@@ -12,6 +12,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -31,7 +33,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service("studyService")
 public class StudyService {
-	
+
+	private Logger log = LoggerFactory.getLogger(getClass());
 	@Autowired
 	private StudyRepository repository;
 	
@@ -197,9 +200,7 @@ public class StudyService {
 	 */
 	public void checkTodayHomework(String email, int studyId) throws AddException {
 		try {
-			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-			Date todayUtilDate = (Date) formatter.parse(new Date().toString());
-			Date created_at = new Date(todayUtilDate.getTime());
+			Date created_at = new Date();
 			repository.insertHomeworkByEmail(email, studyId, created_at);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -269,11 +270,17 @@ public class StudyService {
 					String created_at = (String) object.get("created_at");
 					created_at = created_at.replace("T", " ");
 					created_at = created_at.replace("Z", "");
-					SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-					Date eventUtilDate = (Date) formatter.parse(created_at);
-					Date todayUtilDate = (Date) formatter.parse(new Date().toString());
 
-					if (eventUtilDate.equals(todayUtilDate)) {
+					SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+					Date today = new Date();
+					Date eventUtilDate = (Date) formatter.parse(created_at);
+
+					//날짜비교
+					long diff = (today.getTime() - eventUtilDate.getTime()); // 기준일자 스터디 시작일의 시간차이
+					TimeUnit time = TimeUnit.DAYS; // 시간차이를 날짜로 변환
+					double diffDays = (double) time.convert(diff, TimeUnit.MILLISECONDS);
+
+					if (diffDays == 0.0) {
 						return eventUtilDate;
 					}
 				}

@@ -213,4 +213,10 @@ public interface StudyRepository {
 	 * @throws FindException
 	 */
 	int selectStudyLeaderFinishStudy(String email) throws FindException;
+	
+	/**
+	 * 정산 작업 완료 후 스터디 paid 정보를 1로 변경한다.
+	 * @param studyId
+	 */
+	void updateStudyPaid(int studyId);
 }

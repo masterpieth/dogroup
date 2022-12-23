@@ -3,7 +3,6 @@ package com.dogroup.control;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import javax.servlet.http.HttpSession;
 
@@ -262,6 +261,10 @@ public class StudyRestController {
 		log.info("searchMyStudy(컨트롤러) 시작: currentPage: " + currentPage);
 
 		String email = (String) session.getAttribute("loginedId");
+		if(email == null) {
+
+			return new ResponseEntity<>(null, HttpStatus.OK);
+		}
 		PageBean<StudyDTO> studyList = studyService.getPageBeanMy(currentPage, studyOption, email);
 
 		log.info("searchMyStudy(컨트롤러) 끝");
@@ -282,6 +285,21 @@ public class StudyRestController {
 
 		log.info("subjectList(컨트롤러) 끝");
 		return new ResponseEntity<>(list, HttpStatus.OK);
+	}
+
+
+	/**
+	 * 스터디를 정산한다.
+	 * @param studyId
+	 * @return
+	 * @throws Exception
+	 */
+	@PutMapping("end/{studyId}")
+	public ResponseEntity<?> studyEnd(@PathVariable int studyId) throws Exception {
+		log.info("studyEnd(컨트롤러) 시작 studyId : " + studyId);
+		studyService.endStudy(studyId);
+		log.info("studyEnd(컨트롤러) 종료");
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
 }

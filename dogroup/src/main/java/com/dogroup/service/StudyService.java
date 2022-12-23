@@ -554,6 +554,7 @@ public class StudyService {
 	public void endStudy(int studyId) throws Exception {
 		distributePrizeMoney(studyId);
 		updateStudyUserDiligence(studyId);
+		repository.updateStudyPaid(studyId);
 	}
 	
 	/**

@@ -504,6 +504,14 @@
 			 	 ]]>
       
 	</select>
+	<update id="updateStudyPaid" parameterType="int">
+		UPDATE
+			study
+		SET
+			study_paid = 1 
+		WHERE 
+			study_id = #{stduyId}
+	</update>
 </mapper>
 
 

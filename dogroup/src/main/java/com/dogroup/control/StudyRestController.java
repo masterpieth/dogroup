@@ -53,16 +53,21 @@ public class StudyRestController {
 	 * @throws FindException
 	 */
 	@GetMapping("{studyId}")
-	public ResponseEntity<?> searchStudyInfo(@PathVariable int studyId) throws FindException {
+	public ResponseEntity<?> searchStudyInfo(@PathVariable int studyId, HttpSession session) throws FindException {
 		log.info("searchStudyInfo(컨트롤러) 시작: studyId: " + studyId);
+
+		//String loginedId = (String) session.getAttribute("loginedId");
+		String loginedId = "user1@gmail.com";
 		StudyDTO study = studyService.searchStudyInfo(studyId);
 		List<SubjectDTO> subjects = studyService.getSubjectList();
 		int studyLeaderFinishStudy = studyService.searchStudyLeaderFinishStudy(study.getStudyLeader().getEmail());
+		StudyUserDTO studyUserDTO = studyService.searchMyStudyUserInfo(loginedId,studyId);
 
 		Map<String, Object> map = new HashMap<>();
 		map.put("study", study);
 		map.put("subjects", subjects);
 		map.put("studyLeaderFinishStudy", studyLeaderFinishStudy);
+		map.put("loginedStudyUser", studyUserDTO);
 
 		log.info("searchStudyInfo(컨트롤러) 끝");
 		return new ResponseEntity<>(map, HttpStatus.OK);

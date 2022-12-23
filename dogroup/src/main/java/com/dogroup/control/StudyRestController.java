@@ -3,6 +3,7 @@ package com.dogroup.control;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.servlet.http.HttpSession;
 
@@ -56,19 +57,21 @@ public class StudyRestController {
 	public ResponseEntity<?> searchStudyInfo(@PathVariable int studyId, HttpSession session) throws FindException {
 		log.info("searchStudyInfo(컨트롤러) 시작: studyId: " + studyId);
 
-		//String loginedId = (String) session.getAttribute("loginedId");
-		String loginedId = "user1@gmail.com";
+		String loginedId = (String) session.getAttribute("loginedId");
 		StudyDTO study = studyService.searchStudyInfo(studyId);
 		List<SubjectDTO> subjects = studyService.getSubjectList();
 		int studyLeaderFinishStudy = studyService.searchStudyLeaderFinishStudy(study.getStudyLeader().getEmail());
-		StudyUserDTO studyUserDTO = studyService.searchMyStudyUserInfo(loginedId,studyId);
 
 		Map<String, Object> map = new HashMap<>();
 		map.put("study", study);
 		map.put("subjects", subjects);
 		map.put("studyLeaderFinishStudy", studyLeaderFinishStudy);
-		map.put("loginedStudyUser", studyUserDTO);
-
+		try {
+			StudyUserDTO studyUserDTO = studyService.searchMyStudyUserInfo(loginedId, studyId);
+			map.put("loginedStudyUser", studyUserDTO);
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
 		log.info("searchStudyInfo(컨트롤러) 끝");
 		return new ResponseEntity<>(map, HttpStatus.OK);
 	}
@@ -82,8 +85,8 @@ public class StudyRestController {
 	 * @return
 	 * @throws Exception
 	 */
-	@PostMapping("join/{studyId}")
-	public ResponseEntity<?> joinStudy(@PathVariable int studyId, StudyDTO study, HttpSession session)
+	@PostMapping(value="join/{studyId}", produces = "application/json; charset=utf8")
+	public ResponseEntity<?> joinStudy(@PathVariable int studyId, @RequestBody StudyDTO study, HttpSession session)
 			throws Exception {
 		log.info("joinStudy(컨트롤러) 시작: studyId: " + studyId);
 

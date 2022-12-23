@@ -19,7 +19,9 @@ public class CommonControllerAdvice {
 	@ExceptionHandler(Exception.class)
 	@ResponseBody
 	public ResponseEntity<?> except(Exception e) {
-		return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+		HttpHeaders resHeaders = new HttpHeaders();
+		resHeaders.add("Content-Type", "application/json;charset=UTF-8");
+		return new ResponseEntity<>(e.getMessage(), resHeaders, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
 	@ExceptionHandler(MaxUploadSizeExceededException.class)

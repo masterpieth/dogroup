@@ -657,4 +657,26 @@ public class StudyRepositoryOracle implements StudyRepository {
 		}
 		return cnt;
 	}
+	
+	/**
+	 * 스터디 정산 완료 후 스터디의 paid 여부를 업데이트한다.
+	 */
+	@Override
+	public void updateStudyPaid(int studyId) {
+		log.info("updateStudyPaid 시작");
+		SqlSession session = null;
+		try {
+			session = sqlSessionFactory.openSession();
+			session.update("com.dogroup.mybatis.StudyMapper.updateStudyPaid", studyId);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+
+		} finally {
+			if (session != null) {
+				session.close();
+			}
+			log.info("updateStudyPaid 끝");
+		}
+	}
 }

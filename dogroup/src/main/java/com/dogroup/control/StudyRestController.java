@@ -171,7 +171,6 @@ public class StudyRestController {
 	 * @return
 	 * @throws FindException
 	 */
-
 	@PostMapping("users/{studyId}")
 	public ResponseEntity<?> searchStudyUserInfo(@PathVariable int studyId, @RequestBody Map<String, String> map) throws FindException {
 		
@@ -249,7 +248,7 @@ public class StudyRestController {
 	 * @return
 	 * @throws FindException
 	 */
-	@GetMapping("my/list/{currentPage}")
+	@PostMapping("my/list/{currentPage}")
 	public ResponseEntity<?> searchMyStudy(@PathVariable int currentPage, @RequestBody StudyDTO studyOption,
 			HttpSession session) throws FindException {
 		log.info("searchMyStudy(컨트롤러) 시작: currentPage: " + currentPage);

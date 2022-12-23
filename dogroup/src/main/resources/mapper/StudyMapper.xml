@@ -257,8 +257,10 @@
 			study_title Like '%'||#{studyTitle}||'%' AND
 		</if>
 		<if test="studyLeader != null">
-			user_email Like '%'||#{studyLeader.email}||'%'AND 
-		</if>
+				<if test="studyLeader.email != null">
+					user_email Like '%'||#{studyDTO.studyLeader.email}||'%' AND
+				</if>
+			</if>
 		<if test="studySize != 0">
 			study_size = #{studySize} AND 
 		</if>
@@ -311,8 +313,10 @@
 			<if test="studyDTO.studyTitle != null">
 				study_title Like '%'||#{studyDTO.studyTitle}||'%' AND
 			</if>
-			<if test="studyDTO.studyLeader.email != null">
-				user_email Like '%'||#{studyDTO.studyLeader.email}||'%' AND
+			<if test="studyDTO.studyLeader != null">
+				<if test="studyDTO.studyLeader.email != null">
+					user_email Like '%'||#{studyDTO.studyLeader.email}||'%' AND
+				</if>
 			</if>
 			<if test="studyDTO.studySize != 0">
 				study_size = #{studyDTO.studySize} AND

@@ -657,6 +657,7 @@ public class StudyRepositoryOracle implements StudyRepository {
 		}
 		return cnt;
 	}
+
 	
 	/**
 	 * 스터디 정산 완료 후 스터디의 paid 여부를 업데이트한다.
@@ -671,7 +672,29 @@ public class StudyRepositoryOracle implements StudyRepository {
 
 		} catch (Exception e) {
 			e.printStackTrace();
+		} finally {
+			if (session != null) {
+				session.close();
+			}
+			log.info("updateStudyPaid 끝");
+		}
+	}
 
+	/**
+	 * 스터디 가입 여부를 확인하기 위한 select문
+	 * @return
+	 * @throws FindException
+	 */
+	@Override
+	public StudyUserDTO searchStudyUsersByEmail(Map<String, Object> map) throws FindException {
+		log.info("searchStudyUsersByEmail 시작");
+		SqlSession session = null;
+		try {
+			session = sqlSessionFactory.openSession();
+			return session.selectOne("com.dogroup.mybatis.StudyMapper.searchStudyUsersByEmail", map);
+		} catch(Exception e) {
+			e.printStackTrace();
+			throw new FindException(e.getMessage());
 		} finally {
 			if (session != null) {
 				session.close();

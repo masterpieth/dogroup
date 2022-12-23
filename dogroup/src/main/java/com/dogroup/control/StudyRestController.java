@@ -65,11 +65,18 @@ public class StudyRestController {
 		map.put("study", study);
 		map.put("subjects", subjects);
 		map.put("studyLeaderFinishStudy", studyLeaderFinishStudy);
-		try {
-			StudyUserDTO studyUserDTO = studyService.searchMyStudyUserInfo(loginedId, studyId);
+
+		Map<String, Object> param = new HashMap<>();
+		param.put("email", loginedId);
+		param.put("studyId", studyId);
+		StudyUserDTO studyUserDTO = studyService.searchStudyUsersByEmail(param);
+		if(studyUserDTO != null) {
+			studyUserDTO.setEmail(loginedId);
 			map.put("loginedStudyUser", studyUserDTO);
-		} catch(Exception e) {
-			e.printStackTrace();
+		}
+		List<StudyUserDTO> studyUserList = studyService.getStudyAllUser(studyId);
+		if(studyUserList != null) {
+			map.put("studyUserList", studyUserList);
 		}
 		log.info("searchStudyInfo(컨트롤러) 끝");
 		return new ResponseEntity<>(map, HttpStatus.OK);

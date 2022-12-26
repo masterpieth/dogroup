@@ -111,4 +111,29 @@ public class WalletRepositoryOracle implements WalletRepository {
 			log.info("selectWalletTotalCnt 끝");
 		}
 	}
+	
+	/**
+	 * 사용자의 스터디 정산 보상 금액을 반환한다.
+	 * @throws FindException 
+	 */
+	@Override
+	public int selectWalletStudyEndPrize(int studyId, String email) throws FindException {
+log.info("selectWalletStudyEndPrize 시작: email" + email);
+		Map<String, Object> map = new HashMap<>();
+		map.put("email", email);
+		map.put("studyId", studyId);
+		SqlSession session = null;
+		try {
+			session = sqlSessionFactory.openSession();
+			return session.selectOne("com.dogroup.mybatis.WalletMapper.selectWalletStudyEndPrize", map);
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new FindException("정산 금액 조회에 실패했습니다.");
+		} finally {
+			if(session != null) {
+				session.close();
+			}
+			log.info("selectWalletStudyEndPrize 끝");
+		}
+	}
 }

@@ -308,5 +308,23 @@ public class StudyRestController {
 		log.info("studyEnd(컨트롤러) 종료");
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
+	
+	/**
+	 * 유저의 스터디 보상 금액, 성실도를 보여준다.
+	 * @param studyId
+	 * @param session
+	 * @return
+	 * @throws Exception
+	 */
+	@PostMapping("end/{studyId}")
+	public ResponseEntity<?> studyEndPrize(@PathVariable int studyId, HttpSession session) throws Exception {
+		log.info("githomework(컨트롤러) 시작: studyEndPrize: " + studyId);
+		
+		//String email = (String) session.getAttribute("loginedId");
+		String email = "user12@gmail.com";
+		Map<String, Object> result = studyService.stduyUserEndInfo(studyId, email);
 
+		log.info("studyEndPrize(컨트롤러) 끝");
+		return new ResponseEntity<>(result, HttpStatus.OK);
+	}
 }

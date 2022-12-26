@@ -113,7 +113,7 @@ public class StudyRestController {
 	 * @throws RemoveException
 	 */
 	@DeleteMapping("join/{studyId}")
-	public ResponseEntity<?> leaveStudy(@PathVariable int studyId, StudyDTO study, HttpSession session)
+	public ResponseEntity<?> leaveStudy(@PathVariable int studyId, @RequestBody StudyDTO study, HttpSession session)
 			throws RemoveException {
 		log.info("leaveStudy(컨트롤러) 시작: studyId: " + studyId);
 

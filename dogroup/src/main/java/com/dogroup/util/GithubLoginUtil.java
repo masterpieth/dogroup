@@ -44,7 +44,7 @@ public class GithubLoginUtil {
 	public static final String AUTHORIZE_URL = "https://github.com/login/oauth/authorize";
 	public static final String REDIRECT_URL = "/user/auth/github/callback";
 	public static final String ACCESS_TOKEN_URL = "https://github.com/login/oauth/access_token";
-	public static final String USER_EMAIL_URL = "https://api.github.com/user/emails";
+	public static final String USER_EMAIL_URL = "https://api.github.com/user/public_emails";
 	
 	/**
 	 * 로컬 파일의 내용을 읽어와서 반환한다.
@@ -124,7 +124,7 @@ public class GithubLoginUtil {
 	 * @param accessToken		ACCESS_TOKEN_URL에의 요청을 통해 발급받은 Access Token
 	 * @return					USER_EMAIL_URL에의 요청을 통해 받아온 사용자의 email 값
 	 */
-	public static String getUserEmail(String accessToken) throws Exception {
+	public static String getUserEmail(String accessToken) throws Exception{
 		RestTemplate rt = new RestTemplate();
 		
 		//요청 헤더를 세팅한다.
@@ -140,10 +140,18 @@ public class GithubLoginUtil {
 		ObjectMapper mapper = new ObjectMapper();
 		List<Map<String, Object>> map = mapper.readValue(response.getBody(),
 				new TypeReference<List<Map<String, Object>>>() {});
-		Map<String, Object> emailMap = map.get(0);
+		String email = "";
+		for(Map<String, Object> m : map) {
+			System.out.print("");
+			if(m.get("visibility") != null && m.get("visibility").equals("public")) {
+				email = (String) m.get("email");
+				break;
+			}
+		}
+		Map<String, Object> emailMap = map.get(1);
 		
 		//Parsing한 Map에서 email을 가져온다.
-		String email = (String) emailMap.get("email");
+		//String email = (String) emailMap.get("email");
 		return email;
 	}
 }

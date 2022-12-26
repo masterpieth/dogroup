@@ -362,7 +362,7 @@
 		FROM 
 			(SELECT * FROM 
 				(SELECT rownum rn, a.* FROM 
-					(SELECT * FROM study 
+					(SELECT * FROM (SELECT * FROM study
 					 WHERE
 					 	<if test="studyDTO.studyTitle != null">
 							study_title Like '%'||#{studyDTO.studyTitle}||'%' AND
@@ -397,9 +397,9 @@
 						</if>
 						study_id in (select study_id from study_users WHERE user_email = #{userEmail}) AND
 						<![CDATA[
-							NOT study_size < 0
+							NOT study_size < 0 )
 						]]>
-					ORDER BY study_id) a )
+					ORDER BY study_id desc) a )
 				WHERE
 					rn 
 				BETWEEN #{startRow} AND #{endRow}
@@ -411,7 +411,7 @@
 	
 	<!-- 검색 조건에 맞는 스터디 리스트를 반환한다. -->
 	<select id="selectStudy" parameterType="hashmap" resultMap="studyResultMap">
-		SELECT 
+		SELECT
 			st.*,
 			s.subject_code,
 			s.subject_name,
@@ -421,7 +421,7 @@
 		FROM 
 			(SELECT * FROM 
 				(SELECT rownum rn, a.* FROM 
-					(SELECT * FROM study 
+					(SELECT * FROM (SELECT * FROM study
 					 WHERE
 					 	<if test="studyDTO.studyTitle != null">
 							study_title Like '%'||#{studyDTO.studyTitle}||'%' AND
@@ -455,14 +455,14 @@
 							 ]]>	
 						</if>
 						<![CDATA[
-							NOT study_size < 0
+							NOT study_size < 0 )
 						]]>
-					ORDER BY study_id) a )
+					ORDER BY study_id desc) a )
 				WHERE
 					rn 
 				BETWEEN #{startRow} AND #{endRow}
 			) st 
-		JOIN study_subject ss ON st.study_id = ss.study_id 
+		JOIN study_subject ss ON st.study_id = ss.study_id
 		JOIN subject s ON  ss.subject_code = s.subject_code
 		JOIN users u ON st.user_email = u.user_email
 	</select>

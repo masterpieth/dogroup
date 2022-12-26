@@ -406,7 +406,7 @@
 			) st 
 		JOIN study_subject ss ON st.study_id = ss.study_id 
 		JOIN subject s ON  ss.subject_code = s.subject_code
-		JOIN users u ON st.user_email = u.user_email
+		JOIN users u ON st.user_email = u.user_email ORDER BY rn, subject_code asc
 	</select>
 	
 	<!-- 검색 조건에 맞는 스터디 리스트를 반환한다. -->
@@ -464,7 +464,7 @@
 			) st 
 		JOIN study_subject ss ON st.study_id = ss.study_id
 		JOIN subject s ON  ss.subject_code = s.subject_code
-		JOIN users u ON st.user_email = u.user_email
+		JOIN users u ON st.user_email = u.user_email ORDER BY rn, subject_code asc
 	</select>
 	
 	<!-- 현재 참여중인 스터디중 깃허브 과제제출 방식의 스터디의 갯수를 반환한다. -->

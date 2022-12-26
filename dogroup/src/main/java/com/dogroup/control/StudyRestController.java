@@ -320,8 +320,7 @@ public class StudyRestController {
 	public ResponseEntity<?> studyEndPrize(@PathVariable int studyId, HttpSession session) throws Exception {
 		log.info("githomework(컨트롤러) 시작: studyEndPrize: " + studyId);
 		
-		//String email = (String) session.getAttribute("loginedId");
-		String email = "user12@gmail.com";
+		String email = (String) session.getAttribute("loginedId");
 		Map<String, Object> result = studyService.stduyUserEndInfo(studyId, email);
 
 		log.info("studyEndPrize(컨트롤러) 끝");

@@ -243,7 +243,8 @@
 	<update id="updateStudyStatus" parameterType="int">
 		UPDATE study
 		SET	
-			study_size = -1
+			study_size = -1,
+			study_certification = 0
 		WHERE
 			study_id = #{study_id}
 	</update>

@@ -30,5 +30,14 @@ public interface WalletRepository {
 	 * @return
 	 * @throws FindException
 	 */
-	int selectWalletTotalCnt(String email) throws FindException; 
+	int selectWalletTotalCnt(String email) throws FindException;
+	
+	/**
+	 * 사용자의 스터디 정산 보상 금액을 반환한다.
+	 * @param studyId
+	 * @param email
+	 * @return
+	 * @throws FindException 
+	 */
+	int selectWalletStudyEndPrize(int studyId, String email) throws FindException; 
 }

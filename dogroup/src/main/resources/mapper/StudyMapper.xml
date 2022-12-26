@@ -294,7 +294,7 @@
 	<!-- 스터디의 모든 과제 제출 내역을 반환한다. -->
 	<select id="selectHomeworkByStudyId" parameterType="int" resultType="HomeworkDTO">
 		SELECT
-			*
+			study_submit_dt, study_id, user_email as email
 		FROM
 			homework
 		WHERE

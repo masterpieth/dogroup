@@ -73,4 +73,15 @@ public class WalletService {
 	public int getWalletTotalCnt(String email) throws FindException {
 		return repository.selectWalletTotalCnt(email);
 	}
+	
+	/**
+	 * 사용자의 스터디 정산 보상 금액을 반환한다.
+	 * @param studyId
+	 * @param email
+	 * @return
+	 * @throws Exception
+	 */
+	public int getStudyEndPrize(int studyId, String email) throws Exception {
+		return repository.selectWalletStudyEndPrize(studyId, email);
+	}
 }

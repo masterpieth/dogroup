@@ -56,4 +56,16 @@
 		WHERE
 			user_email = #{email}
 	</select>
+	
+	<!-- 회원의 스터디 보상 금액을 반환한다. -->
+	<select id="selectWalletStudyEndPrize" parameterType="hashmap" resultType="int">
+		SELECT
+			transaction_money
+		FROM 
+			wallet
+		WHERE 
+			user_email = #{email} 
+		AND 
+			study_id = #{studyId}
+	</select>
 </mapper>

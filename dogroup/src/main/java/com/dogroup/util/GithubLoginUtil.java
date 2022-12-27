@@ -140,18 +140,17 @@ public class GithubLoginUtil {
 		ObjectMapper mapper = new ObjectMapper();
 		List<Map<String, Object>> map = mapper.readValue(response.getBody(),
 				new TypeReference<List<Map<String, Object>>>() {});
+
+		//Parsing한 Map에서 email을 가져온다.
 		String email = "";
 		for(Map<String, Object> m : map) {
-			System.out.print("");
 			if(m.get("visibility") != null && m.get("visibility").equals("public")) {
 				email = (String) m.get("email");
 				break;
 			}
 		}
 		Map<String, Object> emailMap = map.get(1);
-		
-		//Parsing한 Map에서 email을 가져온다.
-		//String email = (String) emailMap.get("email");
+
 		return email;
 	}
 }

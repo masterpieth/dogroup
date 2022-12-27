@@ -261,7 +261,7 @@
 		</if>
 		<if test="studyLeader != null">
 				<if test="studyLeader.email != null">
-					user_email Like '%'||#{studyDTO.studyLeader.email}||'%' AND
+					user_email Like '%'||#{studyLeader.email}||'%' AND
 				</if>
 			</if>
 		<if test="studySize != 0">
@@ -272,10 +272,15 @@
 		 		study_diligence_cutline <= #{studyDiligenceCutline} AND
 			 ]]>
 		</if>
-		<if test="studyFee != 0">
-		 	<![CDATA[
-		 		study_fee <= #{studyFee} AND 
-		 	]]>
+		<if test="studyFee > 0">
+			 <![CDATA[
+			 	study_fee <= #{studyFee} AND
+			 ]]>
+		</if>
+		<if test="0 > studyFee">
+			 <![CDATA[
+			 	study_fee = 0 AND
+			 ]]>
 		</if>
 		<if test="studyStartDate != null">
 			<![CDATA[
@@ -329,9 +334,14 @@
 				 	study_diligence_cutline <= #{studyDTO.studyDiligenceCutline} AND
 				 ]]>
 			</if>
-			<if test="studyDTO.studyFee != 0">
+			<if test="studyDTO.studyFee > 0">
 				 <![CDATA[
 				 	study_fee <= #{studyDTO.studyFee} AND
+				 ]]>
+			</if>
+			<if test="0 > studyDTO.studyFee">
+				 <![CDATA[
+				 	study_fee = 0 AND
 				 ]]>
 			</if>
 			<if test="studyDTO.studyStartDate != null">
@@ -380,9 +390,14 @@
 							 	study_diligence_cutline <= #{studyDTO.studyDiligenceCutline} AND
 							 ]]>
 						</if>
-						<if test="studyDTO.studyFee != 0">
+						<if test="studyDTO.studyFee > 0">
 							 <![CDATA[
 							 	study_fee <= #{studyDTO.studyFee} AND
+							 ]]>
+						</if>
+						<if test="0 > studyDTO.studyFee">
+							 <![CDATA[
+							 	study_fee = 0 AND
 							 ]]>
 						</if>
 						<if test="studyDTO.studyStartDate != null">
@@ -439,9 +454,14 @@
 							 	study_diligence_cutline <= #{studyDTO.studyDiligenceCutline} AND
 							 ]]>
 						</if>
-						<if test="studyDTO.studyFee != 0">
+						<if test="studyDTO.studyFee > 0">
 							 <![CDATA[
 							 	study_fee <= #{studyDTO.studyFee} AND
+							 ]]>
+						</if>
+						<if test="0 > studyDTO.studyFee">
+							 <![CDATA[
+							 	study_fee = 0 AND
 							 ]]>
 						</if>
 						<if test="studyDTO.studyStartDate != null">

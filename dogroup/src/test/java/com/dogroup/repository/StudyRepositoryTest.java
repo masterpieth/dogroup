@@ -298,7 +298,7 @@ class StudyRepositoryTest {
 		study.setStudyEndDate(formatDate);
 		studyRepository.selectStudy(1,4,study);
 	}
-	
+	//test1
 	//@Test
 	void 현재진행중인깃방식스터조회테스트() throws Exception {
 		String email = "user1@gmail.com";

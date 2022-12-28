@@ -311,5 +311,4 @@ class StudyRepositoryTest {
 		studyRepository.selectStudyLeaderFinishStudy(email);
 		return 2;
 	}
-	//test
 }

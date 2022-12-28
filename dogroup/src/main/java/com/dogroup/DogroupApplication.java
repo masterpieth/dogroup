@@ -16,7 +16,7 @@ public class DogroupApplication {
 	private static Logger log = LoggerFactory.getLogger(DogroupApplication.class);
 	
 	public static void main(String[] args) {
-		log.info("DoGroup Spring Container 구동 시작");
+		//log.info("DoGroup Spring Container 구동 시작");
 		SpringApplication.run(DogroupApplication.class, args);
 	}
 }
